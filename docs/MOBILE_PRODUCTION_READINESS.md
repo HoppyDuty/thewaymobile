@@ -361,13 +361,16 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
 7. **Onboarding** — verify Rive assets actually exist and render (research flagged
    `assets/rive/` contains only a `.gitkeep`, no real `.riv` files — the onboarding screen may
    currently be silently falling back to a plain icon).
-8. **Icon migration** — move the remaining `Icons.*` call sites onto `AppIcons`, expanding the
-   mapping as needed per screen. CBT's ~20 sites done in Milestone 4; still open across
-   Videos/Books/Profile/onboarding/shell/core widgets — recount at the start of that pass since
-   Milestones 3 and 4 already reduced the original ~150 estimate.
-9. **Offline-architecture work** described in `UI_UX_RULES.md` §11: app-wide reconnect
+8. ~~**Icon migration** — move the remaining `Icons.*` call sites onto `AppIcons`, expanding the
+   mapping as needed per screen.~~ — **DONE** (Milestones 4/5/6/7): every feature migrated
+   (CBT, Home, Books, Dictionary, Notifications, Payments, Video, News, Shepherd, Profile, the
+   shared widget layer, onboarding, app-gate screens). Verified by grepping the whole `lib/`
+   tree for `Icons.*`/`CupertinoIcons.*` call sites outside `app_icons.dart` — zero remain.
+9. ~~**Offline-architecture work** described in `UI_UX_RULES.md` §11: app-wide reconnect
    listening (not gated behind visiting the CBT tab), stale-while-revalidate caching for
-   Home/Videos/Books/News, a basic cache for Profile.
+   Home/Videos/Books/News, a basic cache for Profile.~~ — **DONE** (Milestone 8): all three
+   parts landed — `AppReconnectCoordinator` watched from app root, `seedAndRevalidate()` applied
+   to Home/Leaderboard/Videos/Books/News/Notifications, and Profile gained its first cache.
 10. **Centralize route names** — most feature routes are inline path-string literals; only
     pre-auth/gate routes are named `AppRoute` constants today.
 11. **Backend yt-dlp / video-processing pipeline audit** — out of mobile's direct scope; see
