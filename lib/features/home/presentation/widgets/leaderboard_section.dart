@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_network_image.dart';
@@ -35,10 +36,14 @@ class LeaderboardSection extends StatelessWidget {
                   dense: true,
                   leading: CircleAvatar(
                     radius: 16,
-                    backgroundColor: entry.rank <= 3
-                        ? theme.colorScheme.primaryContainer
-                        : theme.colorScheme.surfaceContainerHighest,
-                    child: Text('${entry.rank}', style: theme.textTheme.labelMedium),
+                    backgroundColor: entry.rank <= 3 ? AppColors.gold100 : theme.colorScheme.surfaceContainerHighest,
+                    child: Text(
+                      '${entry.rank}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: entry.rank <= 3 ? AppColors.gold800 : null,
+                        fontWeight: entry.rank <= 3 ? FontWeight.w700 : null,
+                      ),
+                    ),
                   ),
                   title: Row(
                     children: [

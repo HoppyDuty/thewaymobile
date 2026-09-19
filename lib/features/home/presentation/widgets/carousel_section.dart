@@ -63,6 +63,22 @@ class _CarouselSectionState extends State<CarouselSection> {
                       fit: StackFit.expand,
                       children: [
                         AppNetworkImage(url: slide.imageUrl, borderRadius: AppRadius.lgRadius),
+                        // Scrim so the white overlay text stays legible
+                        // regardless of the underlying image's own
+                        // brightness/content (UI_UX_RULES.md §14).
+                        Positioned.fill(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: AppRadius.lgRadius,
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Colors.black.withValues(alpha: 0), Colors.black.withValues(alpha: 0.65)],
+                                stops: const [0.4, 1.0],
+                              ),
+                            ),
+                          ),
+                        ),
                         Positioned(
                           left: AppSpacing.md,
                           right: AppSpacing.md,

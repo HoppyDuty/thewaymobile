@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_motion.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_button.dart';
-import '../../core/widgets/rive_animation_view.dart';
 import 'onboarding_data.dart';
 import 'onboarding_service.dart';
 
@@ -92,9 +91,8 @@ class _OnboardingPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
-            child: RiveAnimationView(
-              assetPath: data.riveAsset,
-              fallback: Icon(data.fallbackIcon, size: 120, color: theme.colorScheme.primary),
+            child: Center(
+              child: Icon(data.icon, size: 120, color: theme.colorScheme.primary),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),

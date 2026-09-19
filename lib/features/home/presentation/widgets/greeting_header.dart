@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../data/models/greeting.dart';
@@ -50,7 +51,7 @@ class GreetingHeader extends StatelessWidget {
           icon: Badge(
             isLabelVisible: unreadNotifications > 0,
             label: Text('$unreadNotifications'),
-            child: const Icon(Icons.notifications_outlined),
+            child: Icon(unreadNotifications > 0 ? AppIcons.notificationActive : AppIcons.notification),
           ),
         ),
       ],

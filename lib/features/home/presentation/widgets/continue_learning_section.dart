@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_network_image.dart';
@@ -17,9 +18,9 @@ String _routeFor(ContinueLearningItem item) {
 
 IconData _iconFor(String entityType) {
   return switch (entityType) {
-    'video' => Icons.play_circle_outline,
-    'book' => Icons.menu_book_outlined,
-    _ => Icons.quiz_outlined,
+    'video' => AppIcons.video,
+    'book' => AppIcons.book,
+    _ => AppIcons.cbt,
   };
 }
 

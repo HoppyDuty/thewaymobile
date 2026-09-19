@@ -117,6 +117,57 @@ without a space in it) rather than me picking one unilaterally.
 
 ---
 
+## rive_native blocker — resolved
+
+Per your decision, removed `rive`/`rive_native` entirely (`pubspec.yaml`), since no `.riv`
+files were ever shipped (`RiveAnimationView` was always hitting its own fallback icon).
+Deleted `lib/core/widgets/rive_animation_view.dart`; `onboarding_screen.dart`/
+`onboarding_data.dart` now show the fallback icon directly (functionally identical to before
+— the animation was never actually rendering).
+
+**Verified: this fixed it.** A fresh `flutter build apk --debug` progressed completely past
+the `:rive_native:runRiveNativeSetup` step that was failing before. It now fails at a
+**different, unrelated point**: downloading `pdfium-android` (used by `flutter_pdfview`, the
+PDF/book reader) times out with a TLS handshake failure against Maven Central
+(`repo.maven.apache.org`) — `Could not get resource ... Remote host terminated the handshake`.
+This is a network/sandbox limitation of *this development environment* (outbound HTTPS to
+Maven Central being blocked or TLS-intercepted), not a code or dependency defect — a normal
+device/CI environment with standard internet access should not hit this. **Still not verified:
+an actual successful build**, but the specific blocker you asked me to fix is confirmed fixed.
+
+---
+
+## Milestone 3 — Home screen polish
+
+### What changed
+- **Leaderboard gold accent**: top-3 rank badges now use `AppColors.gold100`/`gold800`
+  instead of the generic `primaryContainer` — a direct, restrained application of the "gold =
+  achievement/highlight" rule (`UI_UX_RULES.md` §2), applied only to the 3 elements it's
+  actually meaningful for for on this screen.
+- **Carousel readability fix**: added a bottom-anchored gradient scrim behind the carousel's
+  overlay title/subtitle text. Previously plain white text sat directly on arbitrary
+  admin-uploaded slide images with no guaranteed contrast — a real accessibility gap, not
+  just a style preference.
+- **Icon migration** (first real screens moved onto `AppIcons`, per the plan in Milestone 1):
+  `GreetingHeader`'s notification bell (now also correctly swaps to the filled/active variant
+  when there are unread notifications, which it didn't do before), `ContinueLearningSection`'s
+  per-content-type icon, and `QuickActionsSection`'s 5 action icons.
+
+### Verification performed
+- `flutter analyze` — **VERIFIED**, 0 new issues (whole project and `lib/features/home`
+  specifically both clean).
+- **NOT VERIFIED**: visual appearance (gradient scrim opacity/stops, gold contrast) on a real
+  device — these were reasoned about from the token values and Material contrast guidelines,
+  not eyeballed.
+
+### Not touched in this pass
+Home's underlying data flow, caching, and state architecture (`home_controller.dart`,
+`HomeShimmer`, the `OfflineCache`-based fallback) were left alone — they're already correct
+per the Milestone 1 architecture audit. This pass was visual/accessibility polish only, plus
+the icon-migration pattern now established for future screens to follow.
+
+---
+
 ## Architecture inventory (confirmed by direct code audit, not assumed)
 
 **Screens:** 48 distinct screens/dialogs/sheets across 13 features (auth, home, CBT, video,
@@ -174,14 +225,9 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
     pre-auth/gate routes are named `AppRoute` constants today.
 11. **Backend yt-dlp / video-processing pipeline audit** — out of mobile's direct scope; see
     `thewaybackend/PRODUCTION_READINESS.md` for the backend-side follow-up needed.
-12. **CRITICAL: fix the `rive_native` Android build blocker** — still open. ~~(a) bump to a
-    newer `rive_native`/`rive` release~~ — **tried, did not work**: 0.1.11 (latest available)
-    has the identical unfixed `Expand-Archive` call. Remaining options: (b) if `assets/rive/`
-    genuinely has no `.riv` files in use yet (confirmed empty except `.gitkeep`), remove
-    `rive`/`rive_native` until onboarding actually ships real Rive content, re-adding it then;
-    (c) build from a machine/CI path with no space in it; (d) fork/patch `rive_native` (its
-    setup script is open source) and point at the fork via a `dependency_override` — more
-    durable than hand-patching `pub-cache` but real maintenance overhead. Needs a decision.
+12. ~~CRITICAL: fix the `rive_native` Android build blocker~~ — **RESOLVED** (Milestone 3):
+    removed the dependency; verified the build gets past that step now. A new, unrelated,
+    environment-specific network issue (Maven Central TLS handshake) is documented above.
 
 ## Known limitations of this audit pass
 
