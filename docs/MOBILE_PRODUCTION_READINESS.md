@@ -393,9 +393,10 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
     in the PDF reader (wired up `flutter_pdfview`'s `onRender` callback) and a raw-exception
     leak in its error handler; added an app-level error state for the YouTube player's
     `hasError`/`YoutubeError` cases, which previously fell through to the iframe's own broken-
-    looking embedded error UI. **Not yet reviewed**: `local_video_player_screen.dart`
-    (downloaded-file playback via the `video_player` package) — distinct code path, not covered
-    by the above.
+    looking embedded error UI. `local_video_player_screen.dart` (downloaded-file playback,
+    distinct code path) was also reviewed — already solid as-is (missing-file handling, init
+    loading state, correct play/pause icon swap, scrubbable progress, tooltips) — no changes
+    needed.
 
 ## Known limitations of this audit pass
 
