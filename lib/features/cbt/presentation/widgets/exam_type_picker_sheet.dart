@@ -107,7 +107,6 @@ class _ExamTypeRow extends StatelessWidget {
         child: AppNetworkImage(url: examType.imageUrl, width: 44, height: 44),
       ),
       title: Text(examType.name),
-      subtitle: Text('${examType.subjects.length} subjects'),
       trailing: const Icon(AppIcons.chevronRight),
       onTap: () {
         Navigator.of(context).pop();

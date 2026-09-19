@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
@@ -31,6 +32,7 @@ class ExamSessionState {
     required this.remainingSeconds,
     required this.currentIndex,
     required this.startedAt,
+    required this.optionOrders,
     this.result,
   });
 
@@ -46,7 +48,22 @@ class ExamSessionState {
   final int? remainingSeconds;
   final int currentIndex;
   final int startedAt;
+
+  /// questionId -> shuffled option-key order, pinned for the lifetime of
+  /// this attempt (see `OfflineSessionModel.optionOrders`).
+  final Map<int, List<String>> optionOrders;
   final ExamResultData? result;
+
+  /// A question's options in their shuffled display order — falls back to
+  /// natural order if it's somehow missing an entry (shouldn't happen for
+  /// sessions built after this feature shipped, e.g. an in-progress session
+  /// resumed after an app update).
+  List<OptionModel> orderedOptionsFor(QuestionModel question) {
+    final order = optionOrders[question.id];
+    if (order == null) return question.options;
+    final byKey = {for (final o in question.options) o.key: o};
+    return [for (final key in order) if (byKey[key] != null) byKey[key]!];
+  }
 
   QuestionModel get currentQuestion => orderedQuestions[currentIndex];
   bool get isTimed => remainingSeconds != null;
@@ -87,6 +104,7 @@ class ExamSessionState {
       remainingSeconds: clearRemaining ? null : (remainingSeconds ?? this.remainingSeconds),
       currentIndex: currentIndex ?? this.currentIndex,
       startedAt: startedAt,
+      optionOrders: optionOrders,
       result: result ?? this.result,
     );
   }
@@ -105,9 +123,24 @@ class ExamSessionState {
 @Riverpod(keepAlive: true)
 class ExamSessionController extends _$ExamSessionController {
   Timer? _timer;
+  final _random = Random();
 
   @override
   Future<ExamSessionState> build(String sessionKey) async {
+    ref.onDispose(() {
+      _timer?.cancel();
+    });
+
+    // Resume: `sessionKey` is the exam's `offlineUuid` whenever the caller
+    // navigated here from an existing in-progress session (see
+    // `ExamTypesScreen`'s "Continue exam" affordance) rather than a fresh
+    // session-setup launch — those two cases share this one route/provider
+    // so an app restart mid-exam always lands back in the same place.
+    final existingSession = HiveSetup.offlineSessionsBox.get(sessionKey);
+    if (existingSession != null && existingSession.status == SessionStatus.inProgress) {
+      return _resume(existingSession);
+    }
+
     final configs = ref.read(pendingExamConfigsProvider.notifier);
     final launch = configs.peek(sessionKey);
     if (launch == null) {
@@ -117,10 +150,6 @@ class ExamSessionController extends _$ExamSessionController {
     // synchronously while this provider is still building (peek above is
     // read-only for that reason) — see pending_exam_configs.dart.
     Future.microtask(() => configs.remove(sessionKey));
-
-    ref.onDispose(() {
-      _timer?.cancel();
-    });
 
     final examType = launch.examType;
     final config = launch.sessionConfig;
@@ -180,6 +209,15 @@ class ExamSessionController extends _$ExamSessionController {
     final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
     final remainingSeconds = launch.durationMinutes != null ? launch.durationMinutes! * 60 : null;
 
+    // Shuffle each question's option *order* once, here, for the lifetime of
+    // this attempt — grading always compares by the option's stable key
+    // (`answer()` stores `option.key`, never a position), so reordering how
+    // they're displayed can't break correctness. Pinned to Hive immediately
+    // so a resumed session shows options in the exact same order.
+    final optionOrders = <int, List<String>>{
+      for (final q in orderedQuestions) q.id: (q.options.map((o) => o.key).toList()..shuffle(_random)),
+    };
+
     final sessionModel = OfflineSessionModel(
       offlineUuid: sessionUuid,
       examTypeId: examType.id,
@@ -195,6 +233,8 @@ class ExamSessionController extends _$ExamSessionController {
       remainingSeconds: remainingSeconds,
       status: SessionStatus.inProgress,
       isSynced: isOnlineSession,
+      currentIndex: 0,
+      optionOrders: optionOrders,
     );
     await HiveSetup.offlineSessionsBox.put(sessionUuid, sessionModel);
 
@@ -215,6 +255,49 @@ class ExamSessionController extends _$ExamSessionController {
       remainingSeconds: remainingSeconds,
       currentIndex: 0,
       startedAt: now,
+      optionOrders: optionOrders,
+    );
+  }
+
+  /// Rebuilds state directly from a persisted in-progress session — no
+  /// backend call, no fresh shuffle, no pending-config lookup. Every piece
+  /// (question order, option order, answers, bookmarks, remaining time,
+  /// current position) comes straight from Hive.
+  Future<ExamSessionState> _resume(OfflineSessionModel existing) async {
+    final examType = HiveSetup.examTypesBox.get(existing.examTypeId);
+    if (examType == null) {
+      throw StateError('Exam type ${existing.examTypeId} is not synced locally — cannot resume this session.');
+    }
+
+    final questionsBox = HiveSetup.questionsBox;
+    final orderedQuestions = <QuestionModel>[
+      for (final id in existing.questionIds)
+        if (questionsBox.get(id) case final q?) q,
+    ];
+
+    final questionsBySubject = <int, List<QuestionModel>>{};
+    for (final q in orderedQuestions) {
+      (questionsBySubject[q.subjectId] ??= []).add(q);
+    }
+
+    if ((existing.remainingSeconds ?? 0) > 0) {
+      _startTimer();
+    }
+
+    return ExamSessionState(
+      sessionUuid: existing.offlineUuid,
+      examType: examType,
+      mode: existing.mode,
+      isOnlineSession: existing.isSynced,
+      subjectIds: existing.subjectIds,
+      questionsBySubject: questionsBySubject,
+      orderedQuestions: orderedQuestions,
+      answers: {for (final entry in existing.answers.entries) entry.key: entry.value},
+      bookmarkedIds: existing.bookmarkedQuestionIds.toSet(),
+      remainingSeconds: existing.remainingSeconds,
+      currentIndex: orderedQuestions.isEmpty ? 0 : existing.currentIndex.clamp(0, orderedQuestions.length - 1),
+      startedAt: existing.startedAt,
+      optionOrders: existing.optionOrders,
     );
   }
 
@@ -269,6 +352,7 @@ class ExamSessionController extends _$ExamSessionController {
     final current = state.valueOrNull;
     if (current == null || index < 0 || index >= current.orderedQuestions.length) return;
     state = AsyncData(current.copyWith(currentIndex: index));
+    unawaited(_persistSnapshot());
   }
 
   void next() {
@@ -294,6 +378,7 @@ class ExamSessionController extends _$ExamSessionController {
     };
     model.bookmarkedQuestionIds = current.bookmarkedIds.toList();
     model.remainingSeconds = current.remainingSeconds;
+    model.currentIndex = current.currentIndex;
     await model.save();
   }
 

@@ -46,13 +46,20 @@ class OfflineSessionModelAdapter extends TypeAdapter<OfflineSessionModel> {
           ? const {}
           : (fields[17] as Map).cast<int, num>(),
       isSynced: fields[18] == null ? false : fields[18] as bool,
+      currentIndex: fields[19] == null ? 0 : (fields[19] as num).toInt(),
+      optionOrders: fields[20] == null
+          ? const {}
+          : (fields[20] as Map).map(
+              (dynamic k, dynamic v) =>
+                  MapEntry((k as num).toInt(), (v as List).cast<String>()),
+            ),
     );
   }
 
   @override
   void write(BinaryWriter writer, OfflineSessionModel obj) {
     writer
-      ..writeByte(19)
+      ..writeByte(21)
       ..writeByte(0)
       ..write(obj.offlineUuid)
       ..writeByte(1)
@@ -90,7 +97,11 @@ class OfflineSessionModelAdapter extends TypeAdapter<OfflineSessionModel> {
       ..writeByte(17)
       ..write(obj.subjectScores)
       ..writeByte(18)
-      ..write(obj.isSynced);
+      ..write(obj.isSynced)
+      ..writeByte(19)
+      ..write(obj.currentIndex)
+      ..writeByte(20)
+      ..write(obj.optionOrders);
   }
 
   @override

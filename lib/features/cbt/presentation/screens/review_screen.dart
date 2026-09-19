@@ -44,6 +44,7 @@ class ReviewScreen extends ConsumerWidget {
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: QuestionCard(
                   question: question,
+                  orderedOptions: state.orderedOptionsFor(question),
                   subjectName: HiveSetup.subjectsBox.get(subjectId)?.name ?? 'Subject',
                   questionNumber: (state.questionsBySubject[subjectId] ?? const []).indexOf(question) + 1,
                   selectedAnswer: state.answers[question.id],

@@ -27,6 +27,7 @@ class QuestionCard extends StatelessWidget {
     this.onToggleBookmark,
     this.onAskAi,
     this.showCorrection = false,
+    this.orderedOptions,
   });
 
   final QuestionModel question;
@@ -39,6 +40,12 @@ class QuestionCard extends StatelessWidget {
   final VoidCallback? onToggleBookmark;
   final VoidCallback? onAskAi;
   final bool showCorrection;
+
+  /// This attempt's shuffled option order (see
+  /// `ExamSessionState.orderedOptionsFor`) — falls back to the question's
+  /// natural database order when omitted (e.g. the read-only bookmark
+  /// viewer, which has no exam session/shuffle to pull from).
+  final List<OptionModel>? orderedOptions;
 
   static const _typeLabels = {
     'objective': 'Objective',
@@ -124,16 +131,25 @@ class QuestionCard extends StatelessWidget {
     );
   }
 
+  static const _positionLabels = ['A', 'B', 'C', 'D', 'E'];
+
   Widget _buildOptions(BuildContext context) {
     final theme = Theme.of(context);
+    final options = orderedOptions ?? question.options;
 
     return Column(
       children: [
-        for (final option in question.options)
+        for (final (index, option) in options.indexed)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.sm),
             child: _OptionTile(
               option: option,
+              // The badge shows this option's *position* (A, B, C…) in the
+              // shuffled display order, not its original database letter —
+              // otherwise a shuffled list would show non-sequential badges
+              // like "C, A, D, B". Correctness still keys off `option.key`
+              // (the stable original letter), never this display position.
+              displayLabel: index < _positionLabels.length ? _positionLabels[index] : '${index + 1}',
               selected: selectedAnswer?.toLowerCase() == option.key,
               onTap: onAnswerChanged != null ? () => onAnswerChanged!(option.key) : null,
               status: !showCorrection
@@ -234,9 +250,16 @@ class _FreeTextAnswerFieldState extends State<_FreeTextAnswerField> {
 enum _OptionStatus { neutral, correct, wrong }
 
 class _OptionTile extends StatelessWidget {
-  const _OptionTile({required this.option, required this.selected, required this.onTap, required this.status});
+  const _OptionTile({
+    required this.option,
+    required this.displayLabel,
+    required this.selected,
+    required this.onTap,
+    required this.status,
+  });
 
   final OptionModel option;
+  final String displayLabel;
   final bool selected;
   final VoidCallback? onTap;
   final _OptionStatus status;
@@ -283,7 +306,7 @@ class _OptionTile extends StatelessWidget {
                 radius: 14,
                 backgroundColor: selected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
                 child: Text(
-                  option.key.toUpperCase(),
+                  displayLabel,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                   ),

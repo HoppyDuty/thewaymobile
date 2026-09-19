@@ -7,7 +7,7 @@ part of 'pending_exam_configs.dart';
 // **************************************************************************
 
 String _$pendingExamConfigsHash() =>
-    r'a13f01d0a17693ace4aeed2e04542896bb5adf04';
+    r'90c3c1f0f4128582f5fd2832920ff3127c9fea37';
 
 /// A short-lived, in-memory handoff from the setup screen to
 /// `ExamSessionController`: the setup screen generates a session key,

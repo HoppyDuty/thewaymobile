@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/storage/hive_setup.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -11,6 +12,7 @@ import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/app_shimmer.dart';
 import '../../data/models/exam_type_model.dart';
+import '../../data/models/offline_session_model.dart';
 import '../providers/exam_types_controller.dart';
 import '../widgets/sync_badge.dart';
 
@@ -65,15 +67,88 @@ class ExamTypesScreen extends ConsumerWidget {
             );
           }
 
+          final resumable = _findResumableSession();
+
           return RefreshIndicator(
             onRefresh: () => ref.read(examTypesControllerProvider.notifier).refresh(),
             child: ListView.builder(
               padding: const EdgeInsets.all(AppSpacing.md),
-              itemCount: examTypes.length,
-              itemBuilder: (context, index) => _ExamTypeCard(examType: examTypes[index]),
+              itemCount: examTypes.length + (resumable != null ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (resumable != null) {
+                  if (index == 0) return _ContinueExamCard(session: resumable);
+                  return _ExamTypeCard(examType: examTypes[index - 1]);
+                }
+                return _ExamTypeCard(examType: examTypes[index]);
+              },
             ),
           );
         },
+      ),
+    );
+  }
+
+  /// Most recently started session still `in_progress` — a killed app,
+  /// backgrounded exam, or a deliberate "leave exam" all land here with no
+  /// dedicated resume UI otherwise (autosave already persists everything
+  /// needed to pick back up; nothing previously read it back).
+  OfflineSessionModel? _findResumableSession() {
+    OfflineSessionModel? latest;
+    for (final session in HiveSetup.offlineSessionsBox.values) {
+      if (session.status != SessionStatus.inProgress) continue;
+      if (latest == null || session.startedAt > latest.startedAt) latest = session;
+    }
+    return latest;
+  }
+}
+
+class _ContinueExamCard extends StatelessWidget {
+  const _ContinueExamCard({required this.session});
+
+  final OfflineSessionModel session;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final examType = HiveSetup.examTypesBox.get(session.examTypeId);
+    final answered = session.answers.values.where((v) => v.isNotEmpty).length;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      color: theme.colorScheme.primaryContainer,
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
+      child: InkWell(
+        onTap: () => context.push('/cbt/exam/${session.offlineUuid}'),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Icon(AppIcons.quiz, color: theme.colorScheme.onPrimaryContainer),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Continue exam',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${examType?.name ?? 'Exam'} — $answered of ${session.questionIds.length} answered',
+                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onPrimaryContainer),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(AppIcons.chevronRight, color: theme.colorScheme.onPrimaryContainer),
+            ],
+          ),
+        ),
       ),
     );
   }

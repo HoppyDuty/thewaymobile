@@ -127,6 +127,7 @@ class _ExamBody extends ConsumerWidget {
             child: QuestionCard(
               key: ValueKey(question.id),
               question: question,
+              orderedOptions: state.orderedOptionsFor(question),
               subjectName: subject?.name ?? 'Subject',
               topicName: topic,
               questionNumber: state.currentIndex + 1,

@@ -47,6 +47,8 @@ class OfflineSessionModel extends HiveObject {
     this.totalMaxScore,
     this.subjectScores = const {},
     this.isSynced = false,
+    this.currentIndex = 0,
+    this.optionOrders = const {},
   });
 
   /// Client-generated UUID — the durable local identity of this session,
@@ -120,6 +122,21 @@ class OfflineSessionModel extends HiveObject {
 
   @HiveField(18)
   bool isSynced;
+
+  /// Index into [questionIds] of the question the user was last on —
+  /// persisted so resuming a session lands where they left off, not back
+  /// at question 1.
+  @HiveField(19)
+  int currentIndex;
+
+  /// questionId -> that question's answer-option keys ('a'..'e'), shuffled
+  /// once when the session is built and never reshuffled afterward — a
+  /// resumed session must show every option in the exact same position it
+  /// did before. The key order is what's shuffled, not the option content
+  /// itself, so grading (which always compares by key) is unaffected by
+  /// display order.
+  @HiveField(20)
+  Map<int, List<String>> optionOrders;
 
   bool get isTimed => durationMinutes != null;
 
