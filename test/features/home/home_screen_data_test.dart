@@ -27,7 +27,7 @@ void main() {
           },
         ],
         'recommended_courses': [
-          {'id': 5, 'title': 'Physics Masterclass', 'thumbnail_url': null, 'price': 2000, 'description': null},
+          {'id': 5, 'title': 'Physics Masterclass', 'slug': 'physics-masterclass', 'thumbnail_url': null, 'price': 2000, 'description': null},
         ],
         'leaderboard': {
           'top': [

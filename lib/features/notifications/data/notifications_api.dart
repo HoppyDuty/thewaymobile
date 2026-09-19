@@ -30,13 +30,17 @@ class NotificationsApi {
       if (!e.isNetworkError || page != 1) rethrow;
       final cached = _cache.read('notifications_list');
       if (cached == null) rethrow;
-      final map = Map<String, dynamic>.from(cached.data as Map);
-      final items =
-          (map['items'] as List).map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+      final parsed = tryParseCached(() {
+        final map = Map<String, dynamic>.from(cached.data as Map);
+        final items =
+            (map['items'] as List).map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+        return (items: items, unreadCount: map['unread_count'] as int? ?? 0);
+      });
+      if (parsed == null) rethrow;
       return (
-        items: items,
+        items: parsed.items,
         meta: const PageMeta(currentPage: 1, lastPage: 1, perPage: 20, total: 0, hasMore: false),
-        unreadCount: map['unread_count'] as int? ?? 0,
+        unreadCount: parsed.unreadCount,
       );
     }
   }
@@ -48,10 +52,12 @@ class NotificationsApi {
   ({List<NotificationModel> items, int unreadCount})? readCachedList() {
     final cached = _cache.read('notifications_list');
     if (cached == null) return null;
-    final map = Map<String, dynamic>.from(cached.data as Map);
-    final items =
-        (map['items'] as List).map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e as Map))).toList();
-    return (items: items, unreadCount: map['unread_count'] as int? ?? 0);
+    return tryParseCached(() {
+      final map = Map<String, dynamic>.from(cached.data as Map);
+      final items =
+          (map['items'] as List).map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+      return (items: items, unreadCount: map['unread_count'] as int? ?? 0);
+    });
   }
 
   Future<void> markRead(int id) => _client.patch('/notifications/$id/read');

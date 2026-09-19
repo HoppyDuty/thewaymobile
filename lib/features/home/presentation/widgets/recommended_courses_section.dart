@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_theme_extension.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/app_section_header.dart';
 import '../../data/models/recommended_course.dart';
@@ -34,7 +35,7 @@ class RecommendedCoursesSection extends StatelessWidget {
                 width: 160,
                 child: InkWell(
                   borderRadius: AppRadius.mdRadius,
-                  onTap: () => context.push('/videos/${course.id}'),
+                  onTap: () => context.push('/videos/${course.slug}'),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -49,7 +50,9 @@ class RecommendedCoursesSection extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         course.price == 0 ? 'Free' : '₦${course.price.toStringAsFixed(0)}',
-                        style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary),
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: course.price == 0 ? context.appColors.success : theme.colorScheme.secondary,
+                        ),
                       ),
                     ],
                   ),

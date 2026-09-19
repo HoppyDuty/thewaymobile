@@ -36,14 +36,13 @@ class ExamScreen extends ConsumerWidget {
           child: state.when(
             loading: () => const Center(child: CupertinoActivityIndicator(radius: 14)),
             // No onRetry here, deliberately: build() consumes a one-shot
-            // launch config via pendingExamConfigsProvider.take(sessionKey)
+            // launch config via pendingExamConfigsProvider's peek+remove
             // (see exam_session_controller.dart) — a naive ref.invalidate()
             // retry would find nothing to consume on the second attempt and
             // throw a confusing "No pending exam config" error instead of
             // actually retrying. Fixing this properly needs the launch
-            // config to survive a retry (e.g. peek instead of consume, or
-            // route back to session setup) — a deliberate follow-up, not
-            // guessed at here.
+            // config to survive a retry (e.g. route back to session setup)
+            // — a deliberate follow-up, not guessed at here.
             error: (error, _) => AppErrorState(message: mapErrorToMessage(error), icon: AppIcons.quiz),
             data: (examState) {
               if (examState.result != null) {

@@ -76,15 +76,15 @@ abstract final class HiveSetup {
     await Hive.openBox(settingsBoxName);
     await Hive.openBox(offlineCacheBoxName);
 
-    await Hive.openBox(examTypesBoxName);
-    await Hive.openBox(subjectsBoxName);
-    await Hive.openBox(questionsBoxName);
-    await Hive.openBox(passageGroupsBoxName);
-    await Hive.openBox(offlineSessionsBoxName);
-    await Hive.openBox(deltaCheckpointsBoxName);
-    await Hive.openBox(pendingOperationsBoxName);
-    await Hive.openBox(videoDownloadsBoxName);
-    await Hive.openBox(savedBooksBoxName);
+    await Hive.openBox<ExamTypeModel>(examTypesBoxName);
+    await Hive.openBox<SubjectModel>(subjectsBoxName);
+    await Hive.openBox<QuestionModel>(questionsBoxName);
+    await Hive.openBox<QuestionPassageGroupModel>(passageGroupsBoxName);
+    await Hive.openBox<OfflineSessionModel>(offlineSessionsBoxName);
+    await Hive.openBox<DeltaCheckpointModel>(deltaCheckpointsBoxName);
+    await Hive.openBox<PendingOperation>(pendingOperationsBoxName);
+    await Hive.openBox<DownloadedVideoModel>(videoDownloadsBoxName);
+    await Hive.openBox<SavedBookModel>(savedBooksBoxName);
 
     _initialized = true;
   }

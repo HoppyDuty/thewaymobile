@@ -34,7 +34,11 @@ class BookApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(cacheKey);
       if (cached == null) rethrow;
-      return (cached.data as List<dynamic>).map((c) => BookCategory.fromJson(Map<String, dynamic>.from(c))).toList();
+      final parsed = tryParseCached(
+        () => (cached.data as List<dynamic>).map((c) => BookCategory.fromJson(Map<String, dynamic>.from(c))).toList(),
+      );
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 
@@ -60,9 +64,13 @@ class BookApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(cacheKey);
       if (cached == null) rethrow;
-      final map = Map<String, dynamic>.from(cached.data as Map);
-      final items = (map['items'] as List<dynamic>).map((b) => BookSummary.fromJson(Map<String, dynamic>.from(b))).toList();
-      return BookPage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+      final parsed = tryParseCached(() {
+        final map = Map<String, dynamic>.from(cached.data as Map);
+        final items = (map['items'] as List<dynamic>).map((b) => BookSummary.fromJson(Map<String, dynamic>.from(b))).toList();
+        return BookPage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+      });
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 
@@ -75,9 +83,11 @@ class BookApi {
       _booksPageCacheKey(1, categoryId: categoryId, authorId: authorId, search: search, sortBy: sortBy),
     );
     if (cached == null) return null;
-    final map = Map<String, dynamic>.from(cached.data as Map);
-    final items = (map['items'] as List<dynamic>).map((b) => BookSummary.fromJson(Map<String, dynamic>.from(b))).toList();
-    return BookPage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+    return tryParseCached(() {
+      final map = Map<String, dynamic>.from(cached.data as Map);
+      final items = (map['items'] as List<dynamic>).map((b) => BookSummary.fromJson(Map<String, dynamic>.from(b))).toList();
+      return BookPage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+    });
   }
 
   String _booksPageCacheKey(int page, {int? categoryId, int? authorId, String? search, String sortBy = 'sort_order'}) =>
@@ -93,7 +103,9 @@ class BookApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(cacheKey);
       if (cached == null) rethrow;
-      return BookDetail.fromJson(Map<String, dynamic>.from(cached.data as Map));
+      final parsed = tryParseCached(() => BookDetail.fromJson(Map<String, dynamic>.from(cached.data as Map)));
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 

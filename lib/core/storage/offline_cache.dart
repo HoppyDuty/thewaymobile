@@ -42,5 +42,24 @@ class OfflineCache {
   }
 }
 
+/// Runs [parse] (typically a `.fromJson` call on a value just read from
+/// [OfflineCache]) and swallows any failure, returning `null` instead.
+///
+/// A cache entry can go stale in ways [OfflineCache.read] can't detect —
+/// written under an older app version whose model shape has since changed,
+/// or left partially written by a crash mid-write. Without this, that one
+/// bad entry throws straight out of a `*Controller.build()` (cache reads
+/// happen synchronously, before any network fetch) and permanently bricks
+/// that screen with "Something went wrong" until the app's storage is
+/// cleared. Treating a parse failure the same as "nothing cached" lets the
+/// caller fall through to loading state / a real network fetch instead.
+T? tryParseCached<T>(T Function() parse) {
+  try {
+    return parse();
+  } catch (_) {
+    return null;
+  }
+}
+
 @Riverpod(keepAlive: true)
 OfflineCache offlineCache(OfflineCacheRef ref) => OfflineCache(HiveSetup.offlineCacheBox);

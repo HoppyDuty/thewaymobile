@@ -32,11 +32,15 @@ class PendingExamConfigs extends _$PendingExamConfigs {
     state = {...state, key: config};
   }
 
-  ExamLaunchConfig? take(String key) {
-    final config = state[key];
-    if (config != null) {
+  /// Read-only — Riverpod forbids a provider from mutating another
+  /// provider's state while it's still building (see [remove]), so
+  /// consumers reading this during their own `build()` must peek here and
+  /// defer the actual removal rather than calling a mutating `take()`.
+  ExamLaunchConfig? peek(String key) => state[key];
+
+  void remove(String key) {
+    if (state.containsKey(key)) {
       state = {...state}..remove(key);
     }
-    return config;
   }
 }

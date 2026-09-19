@@ -31,9 +31,10 @@ class NewsApi {
       if (!e.isNetworkError || page != 1) rethrow;
       final cached = _cache.read('news_list');
       if (cached == null) rethrow;
-      final items = (cached.data as List)
-          .map((e) => NewsSummary.fromJson(Map<String, dynamic>.from(e as Map)))
-          .toList();
+      final items = tryParseCached(
+        () => (cached.data as List).map((e) => NewsSummary.fromJson(Map<String, dynamic>.from(e as Map))).toList(),
+      );
+      if (items == null) rethrow;
       return (items: items, meta: const PageMeta(currentPage: 1, lastPage: 1, perPage: 15, total: 0, hasMore: false));
     }
   }
@@ -44,7 +45,9 @@ class NewsApi {
   List<NewsSummary>? readCachedList() {
     final cached = _cache.read('news_list');
     if (cached == null) return null;
-    return (cached.data as List).map((e) => NewsSummary.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+    return tryParseCached(
+      () => (cached.data as List).map((e) => NewsSummary.fromJson(Map<String, dynamic>.from(e as Map))).toList(),
+    );
   }
 
   Future<NewsArticleDetail> getArticle(String slug) async {
@@ -56,7 +59,9 @@ class NewsApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read('news_article_$slug');
       if (cached == null) rethrow;
-      return NewsArticleDetail.fromJson(Map<String, dynamic>.from(cached.data as Map));
+      final parsed = tryParseCached(() => NewsArticleDetail.fromJson(Map<String, dynamic>.from(cached.data as Map)));
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 

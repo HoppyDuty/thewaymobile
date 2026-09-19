@@ -108,10 +108,15 @@ class ExamSessionController extends _$ExamSessionController {
 
   @override
   Future<ExamSessionState> build(String sessionKey) async {
-    final launch = ref.read(pendingExamConfigsProvider.notifier).take(sessionKey);
+    final configs = ref.read(pendingExamConfigsProvider.notifier);
+    final launch = configs.peek(sessionKey);
     if (launch == null) {
       throw StateError('No pending exam config for this session — it may have already been started.');
     }
+    // Deferred a tick: Riverpod forbids mutating another provider's state
+    // synchronously while this provider is still building (peek above is
+    // read-only for that reason) — see pending_exam_configs.dart.
+    Future.microtask(() => configs.remove(sessionKey));
 
     ref.onDispose(() {
       _timer?.cancel();

@@ -34,7 +34,11 @@ class VideoApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(cacheKey);
       if (cached == null) rethrow;
-      return (cached.data as List<dynamic>).map((c) => VideoCategory.fromJson(Map<String, dynamic>.from(c))).toList();
+      final parsed = tryParseCached(
+        () => (cached.data as List<dynamic>).map((c) => VideoCategory.fromJson(Map<String, dynamic>.from(c))).toList(),
+      );
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 
@@ -54,9 +58,13 @@ class VideoApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(cacheKey);
       if (cached == null) rethrow;
-      final map = Map<String, dynamic>.from(cached.data as Map);
-      final items = (map['items'] as List<dynamic>).map((c) => VideoCourseSummary.fromJson(Map<String, dynamic>.from(c))).toList();
-      return VideoCoursePage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+      final parsed = tryParseCached(() {
+        final map = Map<String, dynamic>.from(cached.data as Map);
+        final items = (map['items'] as List<dynamic>).map((c) => VideoCourseSummary.fromJson(Map<String, dynamic>.from(c))).toList();
+        return VideoCoursePage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+      });
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 
@@ -67,10 +75,12 @@ class VideoApi {
   VideoCoursePage? readCachedCourses(int? categoryId) {
     final cached = _cache.read(_coursesPageCacheKey(1, categoryId));
     if (cached == null) return null;
-    final map = Map<String, dynamic>.from(cached.data as Map);
-    final items =
-        (map['items'] as List<dynamic>).map((c) => VideoCourseSummary.fromJson(Map<String, dynamic>.from(c))).toList();
-    return VideoCoursePage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+    return tryParseCached(() {
+      final map = Map<String, dynamic>.from(cached.data as Map);
+      final items =
+          (map['items'] as List<dynamic>).map((c) => VideoCourseSummary.fromJson(Map<String, dynamic>.from(c))).toList();
+      return VideoCoursePage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+    });
   }
 
   String _coursesPageCacheKey(int page, int? categoryId) => 'video_courses_page_${page}_cat_${categoryId ?? ''}';
@@ -85,7 +95,9 @@ class VideoApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(cacheKey);
       if (cached == null) rethrow;
-      return VideoCourseDetail.fromJson(Map<String, dynamic>.from(cached.data as Map));
+      final parsed = tryParseCached(() => VideoCourseDetail.fromJson(Map<String, dynamic>.from(cached.data as Map)));
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 

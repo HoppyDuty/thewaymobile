@@ -32,7 +32,9 @@ class HomeApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(_homeScreenCacheKey);
       if (cached == null) rethrow;
-      return HomeScreenData.fromJson(Map<String, dynamic>.from(cached.data as Map));
+      final parsed = tryParseCached(() => HomeScreenData.fromJson(Map<String, dynamic>.from(cached.data as Map)));
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 
@@ -42,7 +44,7 @@ class HomeApi {
   HomeScreenData? readCachedHomeScreen() {
     final cached = _cache.read(_homeScreenCacheKey);
     if (cached == null) return null;
-    return HomeScreenData.fromJson(Map<String, dynamic>.from(cached.data as Map));
+    return tryParseCached(() => HomeScreenData.fromJson(Map<String, dynamic>.from(cached.data as Map)));
   }
 
   Future<List<ContinueLearningItem>> getContinueLearning() async {
@@ -76,7 +78,9 @@ class HomeApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(_leaderboardCacheKey);
       if (cached == null) rethrow;
-      return Leaderboard.fromJson(Map<String, dynamic>.from(cached.data as Map));
+      final parsed = tryParseCached(() => Leaderboard.fromJson(Map<String, dynamic>.from(cached.data as Map)));
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 
@@ -85,7 +89,7 @@ class HomeApi {
   Leaderboard? readCachedLeaderboard() {
     final cached = _cache.read(_leaderboardCacheKey);
     if (cached == null) return null;
-    return Leaderboard.fromJson(Map<String, dynamic>.from(cached.data as Map));
+    return tryParseCached(() => Leaderboard.fromJson(Map<String, dynamic>.from(cached.data as Map)));
   }
 }
 

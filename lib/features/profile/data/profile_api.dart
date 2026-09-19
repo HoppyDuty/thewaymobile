@@ -37,7 +37,9 @@ class ProfileApi {
       if (!e.isNetworkError) rethrow;
       final cached = _cache.read(_fullProfileCacheKey);
       if (cached == null) rethrow;
-      return FullProfile.fromJson(Map<String, dynamic>.from(cached.data as Map));
+      final parsed = tryParseCached(() => FullProfile.fromJson(Map<String, dynamic>.from(cached.data as Map)));
+      if (parsed == null) rethrow;
+      return parsed;
     }
   }
 
@@ -47,7 +49,7 @@ class ProfileApi {
   FullProfile? readCachedFullProfile() {
     final cached = _cache.read(_fullProfileCacheKey);
     if (cached == null) return null;
-    return FullProfile.fromJson(Map<String, dynamic>.from(cached.data as Map));
+    return tryParseCached(() => FullProfile.fromJson(Map<String, dynamic>.from(cached.data as Map)));
   }
 
   Future<UserStats> getStats() async {
