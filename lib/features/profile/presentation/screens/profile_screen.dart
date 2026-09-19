@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -66,13 +67,13 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(height: AppSpacing.lg),
               OutlinedButton.icon(
                 onPressed: () => _confirmLogout(context, ref),
-                icon: const Icon(Icons.logout),
+                icon: const Icon(AppIcons.logout),
                 label: const Text('Log Out'),
               ),
               const SizedBox(height: AppSpacing.sm),
               TextButton.icon(
                 onPressed: () => context.push('/profile/delete-account'),
-                icon: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
+                icon: Icon(AppIcons.delete, color: Theme.of(context).colorScheme.error),
                 label: Text('Delete Account', style: TextStyle(color: Theme.of(context).colorScheme.error)),
               ),
             ],
@@ -110,7 +111,7 @@ class _ProfileHeader extends StatelessWidget {
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.edit_outlined),
+          icon: const Icon(AppIcons.edit),
           tooltip: 'Edit profile',
           onPressed: () => context.push('/profile/edit'),
         ),
@@ -164,11 +165,11 @@ class _MenuSection extends StatelessWidget {
   const _MenuSection();
 
   static const _items = [
-    (icon: Icons.bar_chart_outlined, label: 'My Stats', route: '/profile/stats'),
-    (icon: Icons.shopping_bag_outlined, label: 'My Purchases', route: '/profile/purchases'),
-    (icon: Icons.receipt_long_outlined, label: 'Payment History', route: '/profile/payments'),
-    (icon: Icons.leaderboard_outlined, label: 'Leaderboard', route: '/profile/leaderboard'),
-    (icon: Icons.settings_outlined, label: 'Preferences', route: '/profile/preferences'),
+    (icon: AppIcons.stats, label: 'My Stats', route: '/profile/stats'),
+    (icon: AppIcons.bag, label: 'My Purchases', route: '/profile/purchases'),
+    (icon: AppIcons.receipt, label: 'Payment History', route: '/profile/payments'),
+    (icon: AppIcons.leaderboard, label: 'Leaderboard', route: '/profile/leaderboard'),
+    (icon: AppIcons.settings, label: 'Preferences', route: '/profile/preferences'),
   ];
 
   @override
@@ -181,7 +182,7 @@ class _MenuSection extends StatelessWidget {
             ListTile(
               leading: Icon(item.icon),
               title: Text(item.label),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(AppIcons.chevronRight),
               onTap: () => context.push(item.route),
             ),
         ],

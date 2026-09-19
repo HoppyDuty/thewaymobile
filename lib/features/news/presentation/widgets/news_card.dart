@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_network_image.dart';
@@ -43,14 +44,14 @@ class NewsCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        news.isLiked == true ? Icons.favorite : Icons.favorite_border,
+                        news.isLiked == true ? AppIcons.likeSelected : AppIcons.like,
                         size: 14,
                         color: news.isLiked == true ? theme.colorScheme.error : theme.colorScheme.outline,
                       ),
                       const SizedBox(width: 4),
                       Text('${news.likesCount}', style: theme.textTheme.labelSmall),
                       const SizedBox(width: AppSpacing.sm),
-                      Icon(Icons.chat_bubble_outline, size: 14, color: theme.colorScheme.outline),
+                      Icon(AppIcons.chat, size: 14, color: theme.colorScheme.outline),
                       const SizedBox(width: 4),
                       Text('${news.commentsCount}', style: theme.textTheme.labelSmall),
                       const Spacer(),

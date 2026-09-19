@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -94,7 +96,7 @@ class _ShepherdSheetScaffold<T> extends StatelessWidget {
                       color: Theme.of(context).colorScheme.primaryContainer,
                       borderRadius: AppRadius.smRadius,
                     ),
-                    child: Icon(Icons.auto_awesome, size: 18, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                    child: Icon(AppIcons.sparkles, size: 18, color: Theme.of(context).colorScheme.onPrimaryContainer),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(title ?? 'Ask Shepherd', style: Theme.of(context).textTheme.titleMedium),
@@ -107,7 +109,7 @@ class _ShepherdSheetScaffold<T> extends StatelessWidget {
                   if (snapshot.connectionState != ConnectionState.done) {
                     return const Padding(
                       padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: CupertinoActivityIndicator()),
                     );
                   }
                   if (snapshot.hasError) {

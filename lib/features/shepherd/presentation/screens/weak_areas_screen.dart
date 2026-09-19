@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme_extension.dart';
@@ -28,7 +30,7 @@ class WeakAreasScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Weak Area Analysis')),
       body: state.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CupertinoActivityIndicator(radius: 14)),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -50,7 +52,7 @@ class WeakAreasScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.insights_outlined, size: 64, color: theme.colorScheme.outline),
+                    Icon(AppIcons.insights, size: 64, color: theme.colorScheme.outline),
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       'Get an AI-powered breakdown of which subjects need the most work, based on your CBT history.',

@@ -217,6 +217,58 @@ loading-indicator level, and the missing celebration accent).
 
 ---
 
+## Milestone 5 — Icon migration: Books, Dictionary, Notifications, Payments, Video, shared widgets
+
+### What changed
+Continued the `AppIcons` migration (Milestones 1/3/4) into the remaining feature screens —
+`book_detail_screen`, `books_list_screen`, `my_books_screen`, `dictionary_screen`,
+`notifications_screen`, `payment_webview_screen`, `payment_sheet`, `local_video_player_screen`,
+`video_course_detail_screen`, `video_courses_screen`, `video_downloads_screen`,
+`video_player_screen` — plus the shared core widgets most screens depend on
+(`app_empty_state`, `app_error_state`, `app_inline_error`, `app_network_image`,
+`app_offline_banner`, and the app-gate `force_update_screen`/`maintenance_screen`). Expanded
+`AppIcons` with the additional glyphs these needed (`checklist`, `history`, `practice`,
+`leaderboard`, `systemUpdate`, `maintenance`, `creditCard`, `wallet`, `bank`, `copy`, `chat`,
+`delete`, `playOutline`, `pauseCircle`, `lock`, `quiz`, and others) rather than falling back to
+raw `Icons.*`/`CupertinoIcons.*` at individual call sites — keeping the single-mapping-file
+promise from Milestone 1 intact as coverage grows.
+
+### Verification performed
+- `flutter analyze` — **VERIFIED**, 0 new issues, whole-project run.
+
+With this pass plus the concurrent News/Shepherd migration landing alongside it, icon
+migration now covers Home, Auth, CBT, Books, Dictionary, Notifications, Payments, Video, News,
+Shepherd, and the shared widget layer — the large majority of the app. Remaining unmigrated
+call sites are concentrated in Profile (not yet touched by any milestone) and a handful of
+screens with genuinely one-off icon needs.
+
+---
+
+## Milestone 6 — Unify the premium "unlock" paywall card (CBT, Videos, Books)
+
+### What changed
+CBT's exam-type unlock prompt, the video-course unlock prompt, and the book unlock prompt were
+three independently-styled but structurally identical `Card`+`ListTile` blocks (icon, title,
+optional subtitle, chevron, tap-to-pay), each using a generic Material `tertiaryContainer`
+role. Extracted a shared `lib/core/widgets/app_unlock_card.dart` (`AppUnlockCard`) and wired all
+three call sites (`mode_selection_screen.dart`, `video_course_detail_screen.dart`,
+`book_detail_screen.dart`) onto it — this is exactly the kind of cross-feature duplication
+`UI_UX_RULES.md` §15 calls out ("a new screen needing a card/badge/chip pattern should get a
+shared component added, not an inline one-off").
+
+At the same time, gave it the brand gold accent (`AppColors.gold50` background, `gold200`
+border, `gold800`/`gold900` text/icon) instead of the generic `tertiaryContainer` — unlocking
+premium content is precisely the kind of restrained "premium moment" `UI_UX_RULES.md` §2
+reserves gold for (badges, achievement/celebration, a highlighted premium action), not
+decoration for its own sake. It's now the second deliberate gold application in the app
+(after the Home leaderboard's top-3 badges in Milestone 3), both narrow and purposeful.
+
+### Verification performed
+- `flutter analyze` — **VERIFIED**, 0 new issues, whole-project run.
+- **NOT VERIFIED**: visual appearance/contrast of the gold treatment on a real device.
+
+---
+
 ## Architecture inventory (confirmed by direct code audit, not assumed)
 
 **Screens:** 48 distinct screens/dialogs/sheets across 13 features (auth, home, CBT, video,

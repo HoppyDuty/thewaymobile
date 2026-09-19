@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -67,7 +69,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(state.valueOrNull?.title ?? 'Ask Shepherd')),
       body: state.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CupertinoActivityIndicator(radius: 14)),
         error: (error, _) => AppErrorState(message: mapErrorToMessage(error)),
         data: (chat) {
           if (chat.messages.isNotEmpty) _scrollToBottom();
@@ -119,7 +121,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       IconButton.filled(
-                        icon: const Icon(Icons.send_rounded),
+                        icon: const Icon(AppIcons.send),
                         onPressed: chat.isSending ? null : _send,
                       ),
                     ],
@@ -174,7 +176,7 @@ class _TypingIndicator extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+          CupertinoActivityIndicator(radius: 8),
           const SizedBox(width: AppSpacing.sm),
           Text('Shepherd is typing…', style: theme.textTheme.bodySmall),
         ],

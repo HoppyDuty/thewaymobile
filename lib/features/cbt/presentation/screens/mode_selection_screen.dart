@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/app_unlock_card.dart';
 import '../../../payments/data/models/payment_models.dart';
 import '../../../payments/presentation/widgets/payment_sheet.dart';
 import '../../data/models/exam_type_model.dart';
@@ -56,23 +57,10 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
           if (examType.price > 0 && !_isPaid) ...[
-            Card(
-              color: theme.colorScheme.tertiaryContainer,
-              shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-              child: ListTile(
-                shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                leading: Icon(AppIcons.unlock, color: theme.colorScheme.onTertiaryContainer),
-                title: Text(
-                  'Unlock Full Access — ₦${examType.price.toStringAsFixed(0)}',
-                  style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
-                ),
-                subtitle: Text(
-                  'Free practice is limited to 5 questions per subject.',
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
-                ),
-                trailing: const Icon(AppIcons.chevronRight),
-                onTap: _unlock,
-              ),
+            AppUnlockCard(
+              title: 'Unlock Full Access — ₦${examType.price.toStringAsFixed(0)}',
+              subtitle: 'Free practice is limited to 5 questions per subject.',
+              onTap: _unlock,
             ),
             const SizedBox(height: AppSpacing.md),
           ],

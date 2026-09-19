@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../data/models/news_comment.dart';
@@ -55,7 +56,7 @@ class NewsCommentTile extends StatelessWidget {
               ),
               if (isOwn && onDelete != null)
                 IconButton(
-                  icon: const Icon(Icons.delete_outline, size: 18),
+                  icon: const Icon(AppIcons.delete, size: 18),
                   visualDensity: VisualDensity.compact,
                   tooltip: 'Delete comment',
                   onPressed: () => _confirmDelete(context),

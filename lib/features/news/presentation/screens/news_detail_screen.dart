@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/error/error_mapper.dart';
 import '../../../../core/notifications/snackbar_service.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_network_image.dart';
@@ -87,12 +89,12 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
               children: [
                 IconButton(
                   onPressed: () => _shareToWhatsApp(article.id),
-                  icon: const Icon(Icons.whatshot_outlined),
+                  icon: const Icon(AppIcons.chat),
                   tooltip: 'Share to WhatsApp',
                 ),
                 IconButton(
                   onPressed: () => _share(article.id),
-                  icon: const Icon(Icons.share_outlined),
+                  icon: const Icon(AppIcons.share),
                   tooltip: 'Share',
                 ),
               ],
@@ -152,13 +154,13 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                           onPressed: () => ref.read(newsDetailControllerProvider(widget.slug).notifier).toggleLike(),
                           tooltip: article.isLiked ? 'Unlike' : 'Like',
                           icon: Icon(
-                            article.isLiked ? Icons.favorite : Icons.favorite_border,
+                            article.isLiked ? AppIcons.likeSelected : AppIcons.like,
                             color: article.isLiked ? theme.colorScheme.error : null,
                           ),
                         ),
                         Text('${article.likesCount}'),
                         const SizedBox(width: AppSpacing.md),
-                        Icon(Icons.chat_bubble_outline, size: 20, color: theme.colorScheme.onSurfaceVariant),
+                        Icon(AppIcons.chat, size: 20, color: theme.colorScheme.onSurfaceVariant),
                         const SizedBox(width: 4),
                         Text('${article.commentsCount}'),
                       ],
@@ -169,7 +171,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                     commentsState.when(
                       loading: () => const Padding(
                         padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(child: CupertinoActivityIndicator()),
                       ),
                       error: (e, _) => Text(mapErrorToMessage(e)),
                       data: (comments) => comments.items.isEmpty
@@ -215,8 +217,8 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                       IconButton.filled(
                         onPressed: _isPostingComment ? null : () => _postComment(article.id),
                         icon: _isPostingComment
-                            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.send_rounded),
+                            ? const CupertinoActivityIndicator(radius: 9)
+                            : const Icon(AppIcons.send),
                       ),
                     ],
                   ),

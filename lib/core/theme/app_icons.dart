@@ -59,6 +59,17 @@ abstract final class AppIcons {
   static const IconData insights = CupertinoIcons.chart_pie;
   static const IconData newChat = CupertinoIcons.plus_bubble;
   static const IconData send = CupertinoIcons.paperplane_fill;
+  static const IconData like = CupertinoIcons.heart;
+  static const IconData likeSelected = CupertinoIcons.heart_fill;
+  static const IconData news = CupertinoIcons.news;
+  static const IconData trending = CupertinoIcons.arrow_up_right;
+  static const IconData star = CupertinoIcons.star;
+  static const IconData clock = CupertinoIcons.clock;
+  static const IconData trophy = CupertinoIcons.rosette;
+  static const IconData bag = CupertinoIcons.bag;
+  static const IconData receipt = CupertinoIcons.doc_plaintext;
+  static const IconData camera = CupertinoIcons.camera;
+  static const IconData stats = CupertinoIcons.graph_square;
 
   // ─── Chrome / actions ───────────────────────────────────────────────────
   static const IconData search = CupertinoIcons.search;

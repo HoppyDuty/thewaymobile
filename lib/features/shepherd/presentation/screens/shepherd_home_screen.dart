@@ -123,7 +123,7 @@ class _ShepherdHomeScreenState extends ConsumerState<ShepherdHomeScreen> {
                 return const AppEmptyState(
                   title: 'No conversations yet',
                   message: 'Tap "New Chat" to start asking Shepherd anything about your exams.',
-                  icon: Icons.chat_bubble_outline,
+                  icon: AppIcons.chat,
                 );
               }
               return Column(
@@ -133,7 +133,7 @@ class _ShepherdHomeScreenState extends ConsumerState<ShepherdHomeScreen> {
                   if (data.isLoadingMore)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: CupertinoActivityIndicator()),
                     ),
                 ],
               );
@@ -190,7 +190,7 @@ class _ConversationTile extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
-        leading: const CircleAvatar(child: Icon(Icons.smart_toy_outlined)),
+        leading: const CircleAvatar(child: Icon(AppIcons.sparkles)),
         title: Text(conversation.title, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(
           conversation.lastMessageAt != null
@@ -198,7 +198,7 @@ class _ConversationTile extends StatelessWidget {
               : '${conversation.messageCount} messages',
           style: theme.textTheme.bodySmall,
         ),
-        trailing: IconButton(icon: const Icon(Icons.delete_outline), onPressed: onDelete),
+        trailing: IconButton(icon: const Icon(AppIcons.delete), onPressed: onDelete),
         onTap: () => context.push('/shepherd/chat/${conversation.uuid}'),
       ),
     );

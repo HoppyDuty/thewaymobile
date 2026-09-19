@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/app_shimmer.dart';
+import '../../../../core/widgets/app_unlock_card.dart';
 import '../../../payments/data/models/payment_models.dart';
 import '../../../payments/presentation/widgets/payment_sheet.dart';
 import '../../data/models/video_course_detail.dart';
@@ -123,23 +124,10 @@ class _CourseDetailBody extends ConsumerWidget {
                 ],
                 if (!course.hasAccess && !course.isFree) ...[
                   const SizedBox(height: AppSpacing.md),
-                  Card(
-                    color: theme.colorScheme.tertiaryContainer,
-                    shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                    child: ListTile(
-                      shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                      leading: Icon(AppIcons.unlock, color: theme.colorScheme.onTertiaryContainer),
-                      title: Text(
-                        'Unlock Full Course — ₦${course.price.toStringAsFixed(0)}',
-                        style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
-                      ),
-                      subtitle: Text(
-                        'Free preview: first ${course.freePreviewCount} lessons.',
-                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
-                      ),
-                      trailing: const Icon(AppIcons.chevronRight),
-                      onTap: () => _unlock(context, ref),
-                    ),
+                  AppUnlockCard(
+                    title: 'Unlock Full Course — ₦${course.price.toStringAsFixed(0)}',
+                    subtitle: 'Free preview: first ${course.freePreviewCount} lessons.',
+                    onTap: () => _unlock(context, ref),
                   ),
                 ],
                 const SizedBox(height: AppSpacing.md),

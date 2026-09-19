@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -31,11 +33,11 @@ class StudyPlanScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Study Plan')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openGenerateSheet(context, ref),
-        icon: const Icon(Icons.auto_awesome),
+        icon: const Icon(AppIcons.sparkles),
         label: const Text('Generate Plan'),
       ),
       body: state.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CupertinoActivityIndicator(radius: 14)),
         error: (error, _) => AppErrorState(
           message: mapErrorToMessage(error),
           onRetry: () => ref.invalidate(studyPlanControllerProvider),
@@ -48,7 +50,7 @@ class StudyPlanScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.calendar_month_outlined, size: 64, color: theme.colorScheme.outline),
+                    Icon(AppIcons.calendar, size: 64, color: theme.colorScheme.outline),
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       'Generate a personalised, week-by-week study plan tailored to your exam date.',
@@ -209,7 +211,7 @@ class _GeneratePlanSheetState extends ConsumerState<_GeneratePlanSheet> {
           const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
             onPressed: _pickDate,
-            icon: const Icon(Icons.calendar_today_outlined),
+            icon: const Icon(AppIcons.calendar),
             label: Text(
               _examDate == null
                   ? 'Choose your exam date'

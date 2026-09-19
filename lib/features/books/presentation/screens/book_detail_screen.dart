@@ -11,6 +11,7 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/app_shimmer.dart';
+import '../../../../core/widgets/app_unlock_card.dart';
 import '../../../payments/data/models/payment_models.dart';
 import '../../../payments/presentation/widgets/payment_sheet.dart';
 import '../../data/models/book_detail.dart';
@@ -145,19 +146,9 @@ class _BookDetailBody extends ConsumerWidget {
                 ],
                 const SizedBox(height: AppSpacing.lg),
                 if (!book.hasAccess && !book.isFree)
-                  Card(
-                    color: theme.colorScheme.tertiaryContainer,
-                    shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                    child: ListTile(
-                      shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                      leading: Icon(AppIcons.unlock, color: theme.colorScheme.onTertiaryContainer),
-                      title: Text(
-                        'Unlock This Book — ₦${book.price.toStringAsFixed(0)}',
-                        style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
-                      ),
-                      trailing: const Icon(AppIcons.chevronRight),
-                      onTap: () => _unlock(context, ref),
-                    ),
+                  AppUnlockCard(
+                    title: 'Unlock This Book — ₦${book.price.toStringAsFixed(0)}',
+                    onTap: () => _unlock(context, ref),
                   )
                 else
                   Row(

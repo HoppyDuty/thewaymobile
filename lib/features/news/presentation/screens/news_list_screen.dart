@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -62,7 +64,7 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
             return const AppEmptyState(
               title: 'No news yet',
               message: 'Check back soon for updates.',
-              icon: Icons.newspaper_outlined,
+              icon: AppIcons.news,
             );
           }
 
@@ -76,7 +78,7 @@ class _NewsListScreenState extends ConsumerState<NewsListScreen> {
                 if (index >= data.items.length) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: CupertinoActivityIndicator()),
                   );
                 }
                 final NewsSummary article = data.items[index];
