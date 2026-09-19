@@ -46,6 +46,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
     setState(() => _isPostingComment = true);
     try {
       await ref.read(newsCommentsControllerProvider(articleId).notifier).addComment(body);
+      ref.read(newsDetailControllerProvider(widget.slug).notifier).adjustCommentsCount(1);
       _commentController.clear();
       if (mounted) FocusScope.of(context).unfocus();
     } catch (e) {
@@ -192,6 +193,7 @@ class _NewsDetailScreenState extends ConsumerState<NewsDetailScreen> {
                                       await ref
                                           .read(newsCommentsControllerProvider(article.id).notifier)
                                           .deleteComment(commentId);
+                                      ref.read(newsDetailControllerProvider(widget.slug).notifier).adjustCommentsCount(-1);
                                     } catch (e) {
                                       if (context.mounted) {
                                         ref.read(snackbarServiceProvider).showError(mapErrorToMessage(e));

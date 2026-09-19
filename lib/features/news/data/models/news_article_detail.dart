@@ -45,7 +45,7 @@ class NewsArticleDetail {
   final NewsAuthor author;
   final bool isLiked;
 
-  NewsArticleDetail copyWith({bool? isLiked, int? likesCount}) {
+  NewsArticleDetail copyWith({bool? isLiked, int? likesCount, int? commentsCount}) {
     return NewsArticleDetail(
       id: id,
       title: title,
@@ -54,7 +54,7 @@ class NewsArticleDetail {
       content: content,
       imageUrl: imageUrl,
       likesCount: likesCount ?? this.likesCount,
-      commentsCount: commentsCount,
+      commentsCount: commentsCount ?? this.commentsCount,
       viewsCount: viewsCount,
       publishedAt: publishedAt,
       author: author,
