@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_icons.dart';
 import '../theme/app_spacing.dart';
 import 'app_button.dart';
 
@@ -12,7 +13,7 @@ class AppErrorState extends StatelessWidget {
     super.key,
     required this.message,
     this.onRetry,
-    this.icon = Icons.cloud_off_rounded,
+    this.icon = AppIcons.offline,
   });
 
   final String message;
@@ -39,7 +40,7 @@ class AppErrorState extends StatelessWidget {
               const SizedBox(height: AppSpacing.lg),
               SizedBox(
                 width: 160,
-                child: AppButton(label: 'Try Again', onPressed: onRetry, icon: Icons.refresh_rounded),
+                child: AppButton(label: 'Try Again', onPressed: onRetry, icon: AppIcons.refresh),
               ),
             ],
           ],

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -50,7 +51,7 @@ class NotificationsScreen extends ConsumerWidget {
             return const AppEmptyState(
               title: 'No notifications yet',
               message: "We'll let you know when something needs your attention.",
-              icon: Icons.notifications_none_rounded,
+              icon: AppIcons.notification,
             );
           }
 
@@ -66,7 +67,7 @@ class NotificationsScreen extends ConsumerWidget {
                   leading: CircleAvatar(
                     backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     child: Icon(
-                      notification.isRead ? Icons.notifications_none : Icons.notifications,
+                      notification.isRead ? AppIcons.notification : AppIcons.notificationActive,
                       color: notification.isRead ? theme.colorScheme.outline : theme.colorScheme.primary,
                     ),
                   ),

@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -66,7 +68,7 @@ class _ShepherdHomeScreenState extends ConsumerState<ShepherdHomeScreen> {
       appBar: AppBar(title: const Text('Shepherd AI Tutor')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/shepherd/chat'),
-        icon: const Icon(Icons.add_comment_outlined),
+        icon: const Icon(AppIcons.newChat),
         label: const Text('New Chat'),
       ),
       body: ListView(
@@ -90,7 +92,7 @@ class _ShepherdHomeScreenState extends ConsumerState<ShepherdHomeScreen> {
             children: [
               Expanded(
                 child: _ToolCard(
-                  icon: Icons.insights_outlined,
+                  icon: AppIcons.insights,
                   label: 'Weak Areas',
                   onTap: () => context.push('/shepherd/weak-areas'),
                 ),
@@ -98,7 +100,7 @@ class _ShepherdHomeScreenState extends ConsumerState<ShepherdHomeScreen> {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: _ToolCard(
-                  icon: Icons.calendar_month_outlined,
+                  icon: AppIcons.calendar,
                   label: 'Study Plan',
                   onTap: () => context.push('/shepherd/study-plan'),
                 ),

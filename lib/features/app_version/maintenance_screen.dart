@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/theme/app_icons.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_logo.dart';
@@ -28,7 +29,7 @@ class MaintenanceScreen extends ConsumerWidget {
               children: [
                 const AppLogo(size: 80),
                 const SizedBox(height: AppSpacing.xl),
-                Icon(Icons.build_rounded, size: 56, color: theme.colorScheme.primary),
+                Icon(AppIcons.maintenance, size: 56, color: theme.colorScheme.primary),
                 const SizedBox(height: AppSpacing.md),
                 Text(title ?? "We'll be right back", style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
                 const SizedBox(height: AppSpacing.sm),

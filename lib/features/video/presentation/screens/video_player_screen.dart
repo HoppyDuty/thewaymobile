@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../data/models/video_lesson.dart';
@@ -24,12 +26,12 @@ class VideoPlayerScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Now Playing')),
       body: state.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CupertinoActivityIndicator(radius: 14)),
         error: (error, _) => AppErrorState(message: mapErrorToMessage(error)),
         data: (course) {
           final lesson = course.lessons.where((l) => l.id == lessonId).firstOrNull;
           if (lesson == null || !lesson.isPlayable) {
-            return const AppErrorState(message: 'This lesson is not available.', icon: Icons.lock_outline);
+            return const AppErrorState(message: 'This lesson is not available.', icon: AppIcons.lock);
           }
           return _PlayerBody(courseId: course.id, lesson: lesson);
         },

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../connectivity/connectivity_provider.dart';
+import '../theme/app_icons.dart';
 import '../theme/app_motion.dart';
 import '../theme/app_spacing.dart';
 
@@ -81,7 +82,7 @@ class _Banner extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.cloud_off_rounded, size: 16, color: colorScheme.onInverseSurface),
+              Icon(AppIcons.offline, size: 16, color: colorScheme.onInverseSurface),
               const SizedBox(width: AppSpacing.sm),
               Text(
                 "You're offline — showing saved content.",

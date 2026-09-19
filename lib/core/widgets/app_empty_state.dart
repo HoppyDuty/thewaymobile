@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_icons.dart';
 import '../theme/app_spacing.dart';
 
 /// "Nothing here yet" placeholder — distinct from [AppErrorState] (per
@@ -11,7 +12,7 @@ class AppEmptyState extends StatelessWidget {
     super.key,
     required this.title,
     this.message,
-    this.icon = Icons.inbox_outlined,
+    this.icon = AppIcons.inbox,
     this.action,
   });
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_icons.dart';
+
 /// Three short, benefit-focused slides (`UI_UX_RULES.md` / backend
 /// `uiuxrules.md` §26). Currently icon-only — `rive`/`rive_native` was
 /// removed (its Android build-time asset download is broken on Windows
@@ -20,19 +22,19 @@ class OnboardingPageData {
 
 const onboardingPages = [
   OnboardingPageData(
-    icon: Icons.school_rounded,
+    icon: AppIcons.bookBadge,
     title: 'Study Anytime, Anywhere',
     subtitle:
         'Practice UTME, WAEC, Post-UTME and more — fully offline. Your questions and progress are always available, connection or not.',
   ),
   OnboardingPageData(
-    icon: Icons.play_circle_rounded,
+    icon: AppIcons.playCircle,
     title: 'Video Courses & Books',
     subtitle:
         'Learn from expert video courses and read your books offline — download once, study whenever it suits you.',
   ),
   OnboardingPageData(
-    icon: Icons.auto_awesome_rounded,
+    icon: AppIcons.sparkles,
     title: 'Meet Shepherd, Your AI Tutor',
     subtitle:
         'Get instant explanations, a personalised study plan, and guidance on the topics you find hardest.',

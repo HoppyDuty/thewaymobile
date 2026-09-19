@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/env/env.dart';
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -64,9 +66,9 @@ class _PaymentGatewaySheetState extends ConsumerState<_PaymentGatewaySheet> {
   PaymentInitiation? _manualInitiation;
 
   static const _gateways = [
-    (value: PaymentGateway.paystack, label: 'Paystack', icon: Icons.credit_card),
-    (value: PaymentGateway.flutterwave, label: 'Flutterwave', icon: Icons.account_balance_wallet_outlined),
-    (value: PaymentGateway.manual, label: 'Bank Transfer (Manual)', icon: Icons.account_balance_outlined),
+    (value: PaymentGateway.paystack, label: 'Paystack', icon: AppIcons.creditCard),
+    (value: PaymentGateway.flutterwave, label: 'Flutterwave', icon: AppIcons.wallet),
+    (value: PaymentGateway.manual, label: 'Bank Transfer (Manual)', icon: AppIcons.bank),
   ];
 
   Future<void> _pay() async {
@@ -110,7 +112,7 @@ class _PaymentGatewaySheetState extends ConsumerState<_PaymentGatewaySheet> {
       builder: (context) => const AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
+            CupertinoActivityIndicator(),
             SizedBox(width: AppSpacing.md),
             Expanded(child: Text('Confirming your payment…')),
           ],
@@ -245,7 +247,7 @@ class _ManualPaymentDetails extends StatelessWidget {
                 label: 'Account Number',
                 value: details.accountNumber,
                 trailing: IconButton(
-                  icon: const Icon(Icons.copy, size: 18),
+                  icon: const Icon(AppIcons.copy, size: 18),
                   tooltip: 'Copy',
                   onPressed: () => onCopy(details.accountNumber),
                 ),
@@ -260,7 +262,7 @@ class _ManualPaymentDetails extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         AppButton(
           label: 'Message Admin on WhatsApp',
-          icon: Icons.chat_outlined,
+          icon: AppIcons.chat,
           onPressed: onMessageAdmin,
         ),
         const SizedBox(height: AppSpacing.sm),

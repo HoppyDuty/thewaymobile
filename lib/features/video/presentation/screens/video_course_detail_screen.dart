@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -103,7 +105,7 @@ class _CourseDetailBody extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [
-                    Icon(Icons.play_circle_outline, size: 16, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(AppIcons.playOutline, size: 16, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 4),
                     Text('${course.videoCount} videos · ${course.duration}', style: theme.textTheme.bodyMedium),
                   ],
@@ -126,7 +128,7 @@ class _CourseDetailBody extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
                     child: ListTile(
                       shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                      leading: Icon(Icons.lock_open_rounded, color: theme.colorScheme.onTertiaryContainer),
+                      leading: Icon(AppIcons.unlock, color: theme.colorScheme.onTertiaryContainer),
                       title: Text(
                         'Unlock Full Course — ₦${course.price.toStringAsFixed(0)}',
                         style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
@@ -135,7 +137,7 @@ class _CourseDetailBody extends ConsumerWidget {
                         'Free preview: first ${course.freePreviewCount} lessons.',
                         style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
                       ),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const Icon(AppIcons.chevronRight),
                       onTap: () => _unlock(context, ref),
                     ),
                   ),
@@ -211,10 +213,10 @@ class _LessonTile extends ConsumerWidget {
               width: 64,
               height: 48,
               decoration: BoxDecoration(color: Colors.black45, borderRadius: AppRadius.smRadius),
-              child: const Icon(Icons.lock_outline, color: Colors.white, size: 18),
+              child: const Icon(AppIcons.lock, color: Colors.white, size: 18),
             )
           else if (lesson.isCompleted)
-            const Icon(Icons.check_circle, color: Colors.white, shadows: [Shadow(blurRadius: 4)]),
+            const Icon(AppIcons.success, color: Colors.white, shadows: [Shadow(blurRadius: 4)]),
         ],
       ),
       title: Text('${index + 1}. ${lesson.title}', maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -226,7 +228,7 @@ class _LessonTile extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _DownloadButton(state: downloadState, onPressed: () => _download(context, ref)),
-                const Icon(Icons.play_arrow_rounded),
+                const Icon(AppIcons.play),
               ],
             )
           : null,
@@ -244,13 +246,13 @@ class _DownloadButton extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (state.status) {
       case VideoDownloadStatus.completed:
-        return Icon(Icons.download_done, color: Theme.of(context).colorScheme.primary);
+        return Icon(AppIcons.downloadDone, color: Theme.of(context).colorScheme.primary);
       case VideoDownloadStatus.queued:
       case VideoDownloadStatus.processingOnServer:
         return const SizedBox(
           width: 24,
           height: 24,
-          child: Padding(padding: EdgeInsets.all(2), child: CircularProgressIndicator(strokeWidth: 2)),
+          child: Padding(padding: EdgeInsets.all(2), child: CupertinoActivityIndicator()),
         );
       case VideoDownloadStatus.downloadingToDevice:
         return SizedBox(
@@ -261,7 +263,7 @@ class _DownloadButton extends StatelessWidget {
       case VideoDownloadStatus.idle:
       case VideoDownloadStatus.failed:
         return IconButton(
-          icon: const Icon(Icons.download_outlined),
+          icon: const Icon(AppIcons.download),
           tooltip: 'Download',
           onPressed: onPressed,
         );

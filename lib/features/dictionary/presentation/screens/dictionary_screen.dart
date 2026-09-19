@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -110,7 +111,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
               onChanged: _onChanged,
               onFieldSubmitted: (_) => _search(),
               suffixIcon: IconButton(
-                icon: const Icon(Icons.search),
+                icon: const Icon(AppIcons.search),
                 tooltip: 'Search',
                 onPressed: () => _search(),
               ),
@@ -152,7 +153,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                       AppEmptyState(
                         title: 'No definition found',
                         message: 'We could not find "${_controller.text.trim()}" in the dictionary.',
-                        icon: Icons.search_off_rounded,
+                        icon: AppIcons.searchOff,
                         action: FilledButton.icon(
                           onPressed: () => showQuickAskSheet(
                             context,
@@ -161,7 +162,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                             prompt:
                                 'Define the word or phrase "${_controller.text.trim()}" simply, with an example sentence.',
                           ),
-                          icon: const Icon(Icons.auto_awesome, size: 18),
+                          icon: const Icon(AppIcons.sparkles, size: 18),
                           label: const Text('Ask AI Instead'),
                         ),
                       ),
@@ -185,7 +186,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                 child: AppEmptyState(
                   title: 'Look up any word',
                   message: 'Search for a word to see its definition, pronunciation, and examples.',
-                  icon: Icons.menu_book_outlined,
+                  icon: AppIcons.dictionary,
                 ),
               )
             else
@@ -253,13 +254,13 @@ class _DictionaryEntryCard extends ConsumerWidget {
                   title: entry.word,
                   prompt: 'Explain the word "${entry.word}" in more depth, with usage tips and example sentences.',
                 ),
-                icon: Icon(Icons.auto_awesome, color: theme.colorScheme.primary),
+                icon: Icon(AppIcons.sparkles, color: theme.colorScheme.primary),
               ),
               if (entry.audioUrl != null)
                 IconButton(
                   tooltip: 'Play pronunciation',
                   onPressed: () => onPlayAudio(entry.audioUrl!),
-                  icon: const Icon(Icons.volume_up_rounded),
+                  icon: const Icon(AppIcons.audio),
                 ),
             ],
           ),

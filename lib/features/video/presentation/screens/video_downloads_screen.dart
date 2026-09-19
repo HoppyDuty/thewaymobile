@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -42,7 +43,7 @@ class VideoDownloadsScreen extends ConsumerWidget {
             return const AppEmptyState(
               title: 'No downloads yet',
               message: 'Download a lesson from a video course to watch it offline for up to 30 days.',
-              icon: Icons.download_outlined,
+              icon: AppIcons.download,
             );
           }
 
@@ -103,7 +104,7 @@ class _DownloadTile extends ConsumerWidget {
           style: theme.textTheme.bodySmall,
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.delete_outline),
+          icon: const Icon(AppIcons.delete),
           tooltip: 'Remove download',
           onPressed: () => _delete(context, ref),
         ),

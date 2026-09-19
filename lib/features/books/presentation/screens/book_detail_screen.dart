@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -117,7 +119,7 @@ class _BookDetailBody extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Row(
                   children: [
-                    Icon(Icons.menu_book_outlined, size: 16, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(AppIcons.book, size: 16, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 4),
                     Text('${book.pageCount} pages', style: theme.textTheme.bodySmall),
                     if (book.publishedYear != null) ...[
@@ -148,12 +150,12 @@ class _BookDetailBody extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
                     child: ListTile(
                       shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                      leading: Icon(Icons.lock_open_rounded, color: theme.colorScheme.onTertiaryContainer),
+                      leading: Icon(AppIcons.unlock, color: theme.colorScheme.onTertiaryContainer),
                       title: Text(
                         'Unlock This Book — ₦${book.price.toStringAsFixed(0)}',
                         style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
                       ),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const Icon(AppIcons.chevronRight),
                       onTap: () => _unlock(context, ref),
                     ),
                   )
@@ -163,7 +165,7 @@ class _BookDetailBody extends ConsumerWidget {
                       Expanded(
                         child: AppButton(
                           label: book.progress != null && book.progress!.currentPage > 1 ? 'Continue Reading' : 'Read',
-                          icon: Icons.menu_book_outlined,
+                          icon: AppIcons.book,
                           onPressed: () => _read(context),
                         ),
                       ),
@@ -190,12 +192,12 @@ class _SaveOfflineButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     switch (state.status) {
       case BookDownloadStatus.completed:
-        return const CircleAvatar(child: Icon(Icons.download_done));
+        return const CircleAvatar(child: Icon(AppIcons.downloadDone));
       case BookDownloadStatus.requesting:
         return const SizedBox(
           width: 40,
           height: 40,
-          child: Padding(padding: EdgeInsets.all(10), child: CircularProgressIndicator(strokeWidth: 2)),
+          child: Padding(padding: EdgeInsets.all(10), child: CupertinoActivityIndicator()),
         );
       case BookDownloadStatus.downloading:
         return SizedBox(
@@ -209,7 +211,7 @@ class _SaveOfflineButton extends ConsumerWidget {
       case BookDownloadStatus.idle:
       case BookDownloadStatus.failed:
         return IconButton.filledTonal(
-          icon: const Icon(Icons.download_outlined),
+          icon: const Icon(AppIcons.download),
           tooltip: 'Save offline',
           onPressed: () async {
             final messenger = ScaffoldMessenger.of(context);

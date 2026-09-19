@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/app_icons.dart';
 import 'app_shimmer.dart';
 
 /// Every remote image in the app should go through this: cached, a
@@ -50,7 +51,7 @@ class AppNetworkImage extends StatelessWidget {
       width: width,
       height: height,
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Icon(Icons.image_not_supported_outlined, color: Theme.of(context).colorScheme.outline),
+      child: Icon(AppIcons.image, color: Theme.of(context).colorScheme.outline),
     );
   }
 }

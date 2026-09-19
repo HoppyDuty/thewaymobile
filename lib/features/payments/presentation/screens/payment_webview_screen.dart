@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../../core/theme/app_icons.dart';
+
 /// Hosts the gateway's hosted checkout page (Paystack/Flutterwave) in-app.
 /// The caller doesn't try to detect a specific redirect URL — once the user
 /// finishes (or gives up) they close this screen with the back/close
@@ -40,7 +42,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
       appBar: AppBar(
         title: Text(widget.title),
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: const Icon(AppIcons.close),
           tooltip: 'Close',
           onPressed: () => Navigator.of(context).pop(),
         ),

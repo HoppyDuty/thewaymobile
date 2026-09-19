@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme_extension.dart';
@@ -56,7 +58,7 @@ class _VideoCoursesScreenState extends ConsumerState<VideoCoursesScreen> {
         title: const Text('Video Courses'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.download_outlined),
+            icon: const Icon(AppIcons.download),
             tooltip: 'My Videos',
             onPressed: () => context.push('/videos/downloads'),
           ),
@@ -120,7 +122,7 @@ class _VideoCoursesScreenState extends ConsumerState<VideoCoursesScreen> {
                   return const AppEmptyState(
                     title: 'No video courses yet',
                     message: 'Check back soon for new courses.',
-                    icon: Icons.play_circle_outline,
+                    icon: AppIcons.playOutline,
                   );
                 }
 
@@ -134,7 +136,7 @@ class _VideoCoursesScreenState extends ConsumerState<VideoCoursesScreen> {
                       if (index >= data.items.length) {
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                          child: Center(child: CircularProgressIndicator()),
+                          child: Center(child: CupertinoActivityIndicator()),
                         );
                       }
                       return _VideoCourseCard(course: data.items[index]);
@@ -189,7 +191,7 @@ class _VideoCourseCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.play_circle_outline, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                      Icon(AppIcons.playOutline, size: 14, color: theme.colorScheme.onSurfaceVariant),
                       const SizedBox(width: 4),
                       Text('${course.videoCount} videos · ${course.duration}', style: theme.textTheme.bodySmall),
                     ],

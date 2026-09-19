@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme_extension.dart';
@@ -74,7 +76,7 @@ class _BooksListScreenState extends ConsumerState<BooksListScreen> {
         title: const Text('Books'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.download_outlined),
+            icon: const Icon(AppIcons.download),
             tooltip: 'My Books',
             onPressed: () => context.push('/books/saved'),
           ),
@@ -88,7 +90,7 @@ class _BooksListScreenState extends ConsumerState<BooksListScreen> {
               label: 'Search books',
               controller: _searchController,
               onChanged: _onSearchChanged,
-              suffixIcon: const Icon(Icons.search),
+              suffixIcon: const Icon(AppIcons.search),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -151,7 +153,7 @@ class _BooksListScreenState extends ConsumerState<BooksListScreen> {
                   return const AppEmptyState(
                     title: 'No books found',
                     message: 'Try a different search or category.',
-                    icon: Icons.menu_book_outlined,
+                    icon: AppIcons.book,
                   );
                 }
 
@@ -169,7 +171,7 @@ class _BooksListScreenState extends ConsumerState<BooksListScreen> {
                     itemCount: data.items.length + (data.hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index >= data.items.length) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CupertinoActivityIndicator());
                       }
                       return _BookCard(book: data.items[index]);
                     },

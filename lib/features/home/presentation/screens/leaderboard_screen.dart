@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -40,7 +41,7 @@ class LeaderboardScreen extends ConsumerWidget {
             return const AppEmptyState(
               title: 'No rankings yet',
               message: 'Complete a CBT exam to appear on the leaderboard.',
-              icon: Icons.leaderboard_outlined,
+              icon: AppIcons.leaderboard,
             );
           }
 

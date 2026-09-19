@@ -37,6 +37,28 @@ abstract final class AppIcons {
   static const IconData checklist = CupertinoIcons.doc_on_clipboard;
   static const IconData history = CupertinoIcons.hourglass;
   static const IconData practice = CupertinoIcons.flame;
+  static const IconData image = CupertinoIcons.photo;
+  static const IconData inbox = CupertinoIcons.tray;
+  static const IconData leaderboard = CupertinoIcons.chart_bar;
+  static const IconData systemUpdate = CupertinoIcons.arrow_up_circle;
+  static const IconData maintenance = CupertinoIcons.wrench;
+  static const IconData bookBadge = CupertinoIcons.book_circle_fill;
+  static const IconData playCircle = CupertinoIcons.play_circle_fill;
+  static const IconData audio = CupertinoIcons.volume_up;
+  static const IconData searchOff = CupertinoIcons.doc_text_search;
+  static const IconData creditCard = CupertinoIcons.creditcard;
+  static const IconData wallet = CupertinoIcons.money_dollar_circle;
+  static const IconData bank = CupertinoIcons.briefcase;
+  static const IconData copy = CupertinoIcons.square_on_square;
+  static const IconData chat = CupertinoIcons.chat_bubble_text;
+  static const IconData delete = CupertinoIcons.trash;
+  static const IconData playOutline = CupertinoIcons.play_circle;
+  static const IconData pauseCircle = CupertinoIcons.pause_circle_fill;
+  static const IconData lock = CupertinoIcons.lock;
+  static const IconData calendar = CupertinoIcons.calendar;
+  static const IconData insights = CupertinoIcons.chart_pie;
+  static const IconData newChat = CupertinoIcons.plus_bubble;
+  static const IconData send = CupertinoIcons.paperplane_fill;
 
   // ─── Chrome / actions ───────────────────────────────────────────────────
   static const IconData search = CupertinoIcons.search;

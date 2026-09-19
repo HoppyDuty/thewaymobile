@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -42,7 +43,7 @@ class MyBooksScreen extends ConsumerWidget {
             return const AppEmptyState(
               title: 'No saved books yet',
               message: 'Save a book offline from its detail page to read it without connectivity for up to 30 days.',
-              icon: Icons.menu_book_outlined,
+              icon: AppIcons.book,
             );
           }
 
@@ -96,7 +97,7 @@ class _SavedBookTile extends ConsumerWidget {
           style: theme.textTheme.bodySmall,
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.delete_outline),
+          icon: const Icon(AppIcons.delete),
           tooltip: 'Remove',
           onPressed: () => _delete(context, ref),
         ),

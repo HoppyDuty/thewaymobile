@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_icons.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 
@@ -25,7 +26,7 @@ class AppInlineError extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.error_outline, color: colorScheme.onErrorContainer, size: 20),
+          Icon(AppIcons.error, color: colorScheme.onErrorContainer, size: 20),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(message, style: TextStyle(color: colorScheme.onErrorContainer)),

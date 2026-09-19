@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
 
@@ -62,7 +64,7 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
       body: _fileMissing
           ? const AppErrorState(
               message: 'This downloaded file is missing. Try downloading it again.',
-              icon: Icons.error_outline,
+              icon: AppIcons.error,
             )
           : Column(
               children: [
@@ -70,7 +72,7 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                   child: Center(
                     child: _controller.value.isInitialized
                         ? AspectRatio(aspectRatio: _controller.value.aspectRatio, child: VideoPlayer(_controller))
-                        : const CircularProgressIndicator(),
+                        : const CupertinoActivityIndicator(radius: 14),
                   ),
                 ),
                 if (_controller.value.isInitialized) ...[
@@ -81,7 +83,7 @@ class _LocalVideoPlayerScreenState extends State<LocalVideoPlayerScreen> {
                       animation: _controller,
                       builder: (context, _) => IconButton(
                         iconSize: 40,
-                        icon: Icon(_controller.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill),
+                        icon: Icon(_controller.value.isPlaying ? AppIcons.pauseCircle : AppIcons.playCircle),
                         tooltip: _controller.value.isPlaying ? 'Pause' : 'Play',
                         onPressed: () => _controller.value.isPlaying ? _controller.pause() : _controller.play(),
                       ),

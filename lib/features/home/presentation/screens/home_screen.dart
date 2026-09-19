@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../providers/home_controller.dart';
@@ -25,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/shepherd'),
-        icon: const Icon(Icons.auto_awesome),
+        icon: const Icon(AppIcons.sparkles),
         label: const Text('Ask Shepherd'),
       ),
       body: SafeArea(
