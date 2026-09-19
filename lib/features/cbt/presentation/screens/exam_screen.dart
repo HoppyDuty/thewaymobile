@@ -8,6 +8,7 @@ import '../../../../core/storage/hive_setup.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_theme_extension.dart';
 import '../../../../core/widgets/app_error_state.dart';
 import '../../../shepherd/presentation/widgets/ask_shepherd_sheet.dart';
 import '../../data/models/question_model.dart';
@@ -34,6 +35,15 @@ class ExamScreen extends ConsumerWidget {
         body: SafeArea(
           child: state.when(
             loading: () => const Center(child: CupertinoActivityIndicator(radius: 14)),
+            // No onRetry here, deliberately: build() consumes a one-shot
+            // launch config via pendingExamConfigsProvider.take(sessionKey)
+            // (see exam_session_controller.dart) — a naive ref.invalidate()
+            // retry would find nothing to consume on the second attempt and
+            // throw a confusing "No pending exam config" error instead of
+            // actually retrying. Fixing this properly needs the launch
+            // config to survive a retry (e.g. peek instead of consume, or
+            // route back to session setup) — a deliberate follow-up, not
+            // guessed at here.
             error: (error, _) => AppErrorState(message: mapErrorToMessage(error), icon: AppIcons.quiz),
             data: (examState) {
               if (examState.result != null) {
@@ -77,12 +87,6 @@ class _ExamBody extends ConsumerWidget {
   final String sessionKey;
   final ExamSessionState state;
 
-  String _formatDuration(int seconds) {
-    final m = seconds ~/ 60;
-    final s = seconds % 60;
-    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -113,17 +117,7 @@ class _ExamBody extends ConsumerWidget {
                 tooltip: 'Calculator',
                 onPressed: () => showCalculatorSheet(context),
               ),
-              if (state.isTimed)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: (state.remainingSeconds ?? 0) < 60
-                        ? theme.colorScheme.errorContainer
-                        : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
-                  child: Text(_formatDuration(state.remainingSeconds ?? 0), style: theme.textTheme.labelLarge),
-                ),
+              if (state.isTimed) _TimerBadge(remainingSeconds: state.remainingSeconds ?? 0),
             ],
           ),
         ),
@@ -213,6 +207,55 @@ class _ExamBody extends ConsumerWidget {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (context) => _QuestionNavigatorSheet(sessionKey: sessionKey, state: state),
+    );
+  }
+}
+
+/// Graduated urgency instead of a binary safe/critical jump: neutral until
+/// 5 minutes remain, then a warning tint, then the error tint inside the
+/// last minute — gives the user advance notice rather than a sudden alarm.
+class _TimerBadge extends StatelessWidget {
+  const _TimerBadge({required this.remainingSeconds});
+
+  final int remainingSeconds;
+
+  static const _warningThreshold = 300; // 5 minutes
+  static const _criticalThreshold = 60; // 1 minute
+
+  String _formatDuration(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = context.appColors;
+
+    final Color background;
+    final Color foreground;
+    if (remainingSeconds < _criticalThreshold) {
+      background = theme.colorScheme.errorContainer;
+      foreground = theme.colorScheme.onErrorContainer;
+    } else if (remainingSeconds < _warningThreshold) {
+      background = appColors.warning.withValues(alpha: 0.16);
+      foreground = appColors.warning;
+    } else {
+      background = theme.colorScheme.surfaceContainerHighest;
+      foreground = theme.colorScheme.onSurfaceVariant;
+    }
+
+    return Semantics(
+      label: 'Time remaining: ${_formatDuration(remainingSeconds)}',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+        decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(AppRadius.pill)),
+        child: Text(
+          _formatDuration(remainingSeconds),
+          style: theme.textTheme.labelLarge?.copyWith(color: foreground, fontWeight: FontWeight.w600),
+        ),
+      ),
     );
   }
 }
@@ -307,19 +350,29 @@ class _QuestionChip extends StatelessWidget {
       foreground = theme.colorScheme.onSurfaceVariant;
     }
 
-    return InkWell(
-      borderRadius: AppRadius.smRadius,
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: AppRadius.smRadius,
-          border: isBookmarked ? Border.all(color: theme.colorScheme.tertiary, width: 2) : null,
+    final statusLabel = [
+      if (isCurrent) 'current question',
+      if (isAnswered) 'answered' else 'not answered',
+      if (isBookmarked) 'bookmarked',
+    ].join(', ');
+
+    return Semantics(
+      button: true,
+      label: 'Question ${index + 1}, $statusLabel',
+      child: InkWell(
+        borderRadius: AppRadius.smRadius,
+        onTap: onTap,
+        child: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: AppRadius.smRadius,
+            border: isBookmarked ? Border.all(color: theme.colorScheme.tertiary, width: 2) : null,
+          ),
+          child: Text('${index + 1}', style: theme.textTheme.labelLarge?.copyWith(color: foreground)),
         ),
-        child: Text('${index + 1}', style: theme.textTheme.labelLarge?.copyWith(color: foreground)),
       ),
     );
   }
