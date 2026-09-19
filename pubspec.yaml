@@ -95,6 +95,19 @@ dev_dependencies:
   riverpod_generator: ^2.6.5
   hive_ce_generator: ^1.9.2
 
+  # App icon generation from assets/images/logo.png (UI_UX_RULES.md §9) — run
+  # `dart run flutter_launcher_icons` after changing the source logo.
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  image_path: "assets/images/logo.png"
+  android: true
+  ios: true
+  # The source logo has transparency (a circular badge); iOS requires a
+  # fully opaque icon, so flatten it onto white for iOS specifically.
+  remove_alpha_ios: true
+  background_color_ios: "#FFFFFF"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
