@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../../core/error/error_mapper.dart';
 import '../../../../core/theme/app_icons.dart';
@@ -13,6 +14,7 @@ import '../../../../core/widgets/app_shimmer.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../shepherd/presentation/widgets/ask_shepherd_sheet.dart';
 import '../../data/dictionary_api.dart';
+import '../../data/dictionary_local_store.dart';
 import '../../data/models/dictionary_entry.dart';
 
 class DictionaryScreen extends ConsumerStatefulWidget {
@@ -25,6 +27,7 @@ class DictionaryScreen extends ConsumerStatefulWidget {
 class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
   final _controller = TextEditingController();
   final _player = AudioPlayer();
+  final _tts = FlutterTts();
   Timer? _debounce;
 
   bool _isLoading = false;
@@ -32,13 +35,30 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
   List<DictionaryEntry>? _results;
   List<String> _suggestions = [];
   List<String> _didYouMean = [];
+  List<String> _recentSearches = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshRecentSearches();
+  }
 
   @override
   void dispose() {
     _controller.dispose();
     _debounce?.cancel();
     _player.dispose();
+    _tts.stop();
     super.dispose();
+  }
+
+  void _refreshRecentSearches() {
+    setState(() => _recentSearches = ref.read(dictionaryLocalStoreProvider).recentSearches());
+  }
+
+  Future<void> _clearRecentSearches() async {
+    await ref.read(dictionaryLocalStoreProvider).clearRecentSearches();
+    _refreshRecentSearches();
   }
 
   void _onChanged(String value) {
@@ -60,6 +80,10 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
     if (word != null) _controller.text = word;
     FocusScope.of(context).unfocus();
 
+    final localStore = ref.read(dictionaryLocalStoreProvider);
+    await localStore.recordSearch(query);
+    _refreshRecentSearches();
+
     setState(() {
       _isLoading = true;
       _searched = true;
@@ -68,12 +92,23 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
       _didYouMean = [];
     });
 
+    // Offline-first: a word already looked up successfully before never
+    // needs the network again (`UI_UX_RULES.md` §11 / product spec §32).
+    final cached = localStore.read(query);
+    if (cached != null) {
+      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() => _results = cached);
+      return;
+    }
+
     try {
       final results = await ref.read(dictionaryApiProvider).lookup(query);
       if (results == null) {
         // Not found — offer spelling-based alternatives.
         final alternatives = await ref.read(dictionaryApiProvider).suggest(query.substring(0, (query.length - 1).clamp(1, query.length)));
         if (mounted) setState(() => _didYouMean = alternatives.take(5).toList());
+      } else {
+        await localStore.write(query, results);
       }
       if (mounted) setState(() => _results = results);
     } catch (e) {
@@ -85,11 +120,29 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
     }
   }
 
-  Future<void> _playAudio(String url) async {
+  /// Plays the provider's real pronunciation audio when available; falls
+  /// back to on-device text-to-speech otherwise (or if playback itself
+  /// fails) so the pronounce button is never a silent no-op — previously it
+  /// simply wasn't shown at all for a word with no audioUrl.
+  Future<void> _pronounce(DictionaryEntry entry) async {
+    if (entry.audioUrl != null) {
+      try {
+        await _player.play(UrlSource(entry.audioUrl!.startsWith('http') ? entry.audioUrl! : 'https:${entry.audioUrl}'));
+        return;
+      } catch (_) {
+        // Fall through to TTS below.
+      }
+    }
+
     try {
-      await _player.play(UrlSource(url.startsWith('http') ? url : 'https:$url'));
+      await _tts.setLanguage('en-US');
+      await _tts.speak(entry.word);
     } catch (_) {
-      // Best-effort — a failed pronunciation playback shouldn't interrupt anything else.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Couldn't play pronunciation.")),
+        );
+      }
     }
   }
 
@@ -182,12 +235,31 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                 ),
               )
             else if (!_searched)
-              const Expanded(
-                child: AppEmptyState(
-                  title: 'Look up any word',
-                  message: 'Search for a word to see its definition, pronunciation, and examples.',
-                  icon: AppIcons.dictionary,
-                ),
+              Expanded(
+                child: _recentSearches.isEmpty
+                    ? const AppEmptyState(
+                        title: 'Look up any word',
+                        message: 'Search for a word to see its definition, pronunciation, and examples.',
+                        icon: AppIcons.dictionary,
+                      )
+                    : ListView(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Recent searches', style: theme.textTheme.titleSmall),
+                              TextButton(onPressed: _clearRecentSearches, child: const Text('Clear')),
+                            ],
+                          ),
+                          for (final word in _recentSearches)
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(AppIcons.clock),
+                              title: Text(word),
+                              onTap: () => _search(word),
+                            ),
+                        ],
+                      ),
               )
             else
               Expanded(
@@ -195,7 +267,7 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
                   itemCount: _results!.length,
                   itemBuilder: (context, index) => _DictionaryEntryCard(
                     entry: _results![index],
-                    onPlayAudio: _playAudio,
+                    onPronounce: _pronounce,
                   ),
                 ),
               ),
@@ -207,10 +279,10 @@ class _DictionaryScreenState extends ConsumerState<DictionaryScreen> {
 }
 
 class _DictionaryEntryCard extends ConsumerWidget {
-  const _DictionaryEntryCard({required this.entry, required this.onPlayAudio});
+  const _DictionaryEntryCard({required this.entry, required this.onPronounce});
 
   final DictionaryEntry entry;
-  final void Function(String url) onPlayAudio;
+  final void Function(DictionaryEntry entry) onPronounce;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -256,12 +328,11 @@ class _DictionaryEntryCard extends ConsumerWidget {
                 ),
                 icon: Icon(AppIcons.sparkles, color: theme.colorScheme.primary),
               ),
-              if (entry.audioUrl != null)
-                IconButton(
-                  tooltip: 'Play pronunciation',
-                  onPressed: () => onPlayAudio(entry.audioUrl!),
-                  icon: const Icon(AppIcons.audio),
-                ),
+              IconButton(
+                tooltip: 'Play pronunciation',
+                onPressed: () => onPronounce(entry),
+                icon: const Icon(AppIcons.audio),
+              ),
             ],
           ),
           for (final meaning in entry.meanings) ...[

@@ -10,6 +10,8 @@ class DictionaryDefinition {
       example: json['example'] as String?,
     );
   }
+
+  Map<String, dynamic> toJson() => {'definition': definition, 'example': example};
 }
 
 class DictionaryMeaning {
@@ -26,6 +28,11 @@ class DictionaryMeaning {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'partOfSpeech': partOfSpeech,
+        'definitions': definitions.map((d) => d.toJson()).toList(),
+      };
 }
 
 class DictionaryEntry {
@@ -58,4 +65,14 @@ class DictionaryEntry {
           .toList(),
     );
   }
+
+  /// Round-trips back through [fromJson] — used to persist a successful
+  /// lookup locally (see `HiveSetup.settingsBox` dictionary cache) so a
+  /// repeat search never needs the network.
+  Map<String, dynamic> toJson() => {
+        'word': word,
+        'phonetic': phonetic,
+        'phonetics': audioUrl != null ? [{'audio': audioUrl}] : const [],
+        'meanings': meanings.map((m) => m.toJson()).toList(),
+      };
 }
