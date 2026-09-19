@@ -76,10 +76,24 @@ class _BookDetailBody extends ConsumerWidget {
     }
   }
 
-  void _read(BuildContext context) {
+  // `book.pdfUrl` is only populated once the backend's PDF-upload job has
+  // finished (see BookService::getBookDetail) — it can legitimately be null
+  // for a purchased/free book if that job hasn't run yet or silently failed.
+  // Previously this force-unwrapped it, crashing uncaught inside onPressed
+  // with no visible feedback ("tap Read, nothing happens"). An already
+  // downloaded offline copy is still readable even when pdfUrl is null,
+  // since the reader checks its local Hive-saved file before ever touching
+  // this URL.
+  void _read(BuildContext context, {required bool hasOfflineCopy}) {
+    if (book.pdfUrl == null && !hasOfflineCopy) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("This book isn't available to read right now. Please try again shortly.")),
+      );
+      return;
+    }
     context.push(
       '/books/${book.slug}/read',
-      extra: PdfReaderArgs(bookId: book.id, pdfUrl: book.pdfUrl!, title: book.title, initialPage: book.progress?.currentPage ?? 1),
+      extra: PdfReaderArgs(bookId: book.id, pdfUrl: book.pdfUrl ?? '', title: book.title, initialPage: book.progress?.currentPage ?? 1),
     );
   }
 
@@ -157,7 +171,10 @@ class _BookDetailBody extends ConsumerWidget {
                         child: AppButton(
                           label: book.progress != null && book.progress!.currentPage > 1 ? 'Continue Reading' : 'Read',
                           icon: AppIcons.book,
-                          onPressed: () => _read(context),
+                          onPressed: () => _read(
+                            context,
+                            hasOfflineCopy: downloadState.status == BookDownloadStatus.completed,
+                          ),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
