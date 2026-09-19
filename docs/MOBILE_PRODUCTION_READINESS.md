@@ -355,12 +355,22 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
    the flow's structure/tokens/accessibility were already solid (confirmed by direct audit, not
    assumed), so this landed as icon migration + loading-state-level correction + a gold
    celebration accent, not a ground-up rebuild — see Milestone 4 for the reasoning.
-4. **Videos** — listing/detail/player/downloads visual rebuild.
-5. **Books** — listing/detail/reader/saved visual rebuild.
-6. **Profile** — hub + edit/stats/purchases/payments/preferences visual rebuild.
-7. **Onboarding** — verify Rive assets actually exist and render (research flagged
-   `assets/rive/` contains only a `.gitkeep`, no real `.riv` files — the onboarding screen may
-   currently be silently falling back to a plain icon).
+4. ~~**Videos** — listing/detail/player/downloads visual rebuild.~~ — **substantially addressed**,
+   same finding as CBT: listing/detail already had shimmer, error/empty states, correct
+   determinate-vs-indeterminate download progress, and category chips before this pass touched
+   them, so this landed as `AppUnlockCard` gold-accent unification (Milestone 6), icon migration,
+   and a delete-confirmation dialog (Milestone 10), not a ground-up rebuild. **Not yet reviewed**:
+   the actual playback UI (`video_player_screen.dart`/`local_video_player_screen.dart`).
+5. ~~**Books** — listing/detail/reader/saved visual rebuild.~~ — same finding as Videos:
+   substantially addressed via `AppUnlockCard`, icon migration, and a delete-confirmation dialog,
+   not a ground-up rebuild. **Not yet reviewed**: `pdf_reader_screen.dart` itself.
+6. ~~**Profile** — hub + edit/stats/purchases/payments/preferences visual rebuild.~~ — **DONE**
+   (Milestone 7): icon migration across all remaining Profile screens, plus a gold accent on the
+   streak stat.
+7. ~~**Onboarding** — verify Rive assets actually exist and render.~~ — **resolved by removal**
+   (Milestone 3): `rive`/`rive_native` were removed entirely (see the rive_native blocker section
+   above) rather than fixed, since no `.riv` files were ever shipped — the concern is now moot,
+   onboarding shows its fallback icons directly with no Rive dependency at all.
 8. ~~**Icon migration** — move the remaining `Icons.*` call sites onto `AppIcons`, expanding the
    mapping as needed per screen.~~ — **DONE** (Milestones 4/5/6/7): every feature migrated
    (CBT, Home, Books, Dictionary, Notifications, Payments, Video, News, Shepherd, Profile, the
@@ -378,6 +388,10 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
 12. ~~CRITICAL: fix the `rive_native` Android build blocker~~ — **RESOLVED** (Milestone 3):
     removed the dependency; verified the build gets past that step now. A new, unrelated,
     environment-specific network issue (Maven Central TLS handshake) is documented above.
+13. **Video player / PDF reader screens** — `video_player_screen.dart` (YouTube iframe),
+    `local_video_player_screen.dart` (downloaded-file playback), `pdf_reader_screen.dart` (remote
+    + local dual-source reading) haven't been directly reviewed by any milestone yet — these are
+    the actual media-consumption UIs, distinct from the listing/detail screens already covered.
 
 ## Known limitations of this audit pass
 
