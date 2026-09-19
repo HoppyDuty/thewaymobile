@@ -388,10 +388,14 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
 12. ~~CRITICAL: fix the `rive_native` Android build blocker~~ — **RESOLVED** (Milestone 3):
     removed the dependency; verified the build gets past that step now. A new, unrelated,
     environment-specific network issue (Maven Central TLS handshake) is documented above.
-13. **Video player / PDF reader screens** — `video_player_screen.dart` (YouTube iframe),
-    `local_video_player_screen.dart` (downloaded-file playback), `pdf_reader_screen.dart` (remote
-    + local dual-source reading) haven't been directly reviewed by any milestone yet — these are
-    the actual media-consumption UIs, distinct from the listing/detail screens already covered.
+13. ~~**Video player / PDF reader screens**~~ — **DONE** (Milestone 11) for
+    `video_player_screen.dart`/`pdf_reader_screen.dart`: fixed a blank-screen-while-loading gap
+    in the PDF reader (wired up `flutter_pdfview`'s `onRender` callback) and a raw-exception
+    leak in its error handler; added an app-level error state for the YouTube player's
+    `hasError`/`YoutubeError` cases, which previously fell through to the iframe's own broken-
+    looking embedded error UI. **Not yet reviewed**: `local_video_player_screen.dart`
+    (downloaded-file playback via the `video_player` package) — distinct code path, not covered
+    by the above.
 
 ## Known limitations of this audit pass
 
