@@ -10,9 +10,23 @@ part 'dictionary_api.g.dart';
 /// is a different host entirely and needs none of our device-fingerprint/
 /// auth headers.
 class DictionaryApi {
+  // Found on a real device with a poor connection: neither Dio instance had
+  // a timeout configured (Dio's default is none), so a lookup with a slow/
+  // stalled connection left the screen stuck on its loading shimmer forever
+  // — _isLoading only ever cleared in the `finally` of a request that never
+  // itself resolved or threw. Matches ApiClient's own timeouts for
+  // consistency.
   DictionaryApi()
-      : _dio = Dio(BaseOptions(baseUrl: 'https://api.dictionaryapi.dev/api/v2')),
-        _suggestDio = Dio(BaseOptions(baseUrl: 'https://api.datamuse.com'));
+      : _dio = Dio(BaseOptions(
+          baseUrl: 'https://api.dictionaryapi.dev/api/v2',
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 20),
+        )),
+        _suggestDio = Dio(BaseOptions(
+          baseUrl: 'https://api.datamuse.com',
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 20),
+        ));
 
   final Dio _dio;
 
