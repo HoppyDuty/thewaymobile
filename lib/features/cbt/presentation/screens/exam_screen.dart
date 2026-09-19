@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
 import '../../../../core/storage/hive_setup.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -31,14 +33,14 @@ class ExamScreen extends ConsumerWidget {
       child: Scaffold(
         body: SafeArea(
           child: state.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => AppErrorState(message: mapErrorToMessage(error), icon: Icons.quiz_outlined),
+            loading: () => const Center(child: CupertinoActivityIndicator(radius: 14)),
+            error: (error, _) => AppErrorState(message: mapErrorToMessage(error), icon: AppIcons.quiz),
             data: (examState) {
               if (examState.result != null) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   context.pushReplacement('/cbt/exam/$sessionKey/result');
                 });
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: CupertinoActivityIndicator(radius: 14));
               }
               return _ExamBody(sessionKey: sessionKey, state: examState);
             },
@@ -95,7 +97,7 @@ class _ExamBody extends ConsumerWidget {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.menu_open),
+                icon: const Icon(AppIcons.list),
                 tooltip: 'Questions',
                 onPressed: () => _openQuestionNavigator(context, ref),
               ),
@@ -107,7 +109,7 @@ class _ExamBody extends ConsumerWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.calculate_outlined),
+                icon: const Icon(AppIcons.calculator),
                 tooltip: 'Calculator',
                 onPressed: () => showCalculatorSheet(context),
               ),

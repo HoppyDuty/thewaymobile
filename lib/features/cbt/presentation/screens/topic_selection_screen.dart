@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/storage/hive_setup.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -26,7 +27,7 @@ class TopicSelectionScreen extends StatelessWidget {
           ? const AppEmptyState(
               title: 'No topics synced for this subject',
               message: 'Connect to the internet to sync the full subject/topic list.',
-              icon: Icons.topic_outlined,
+              icon: AppIcons.topic,
             )
           : ListView.builder(
               padding: const EdgeInsets.all(AppSpacing.md),
@@ -39,7 +40,7 @@ class TopicSelectionScreen extends StatelessWidget {
                   child: ListTile(
                     shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
                     title: Text(topic.name),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const Icon(AppIcons.chevronRight),
                     onTap: () => context.push('/cbt/setup', extra: args.copyWith(topicId: topic.id)),
                   ),
                 );

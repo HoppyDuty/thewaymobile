@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../data/services/sync_manager.dart';
 import '../providers/pending_sync_count_controller.dart';
 
@@ -30,12 +32,8 @@ class SyncBadge extends ConsumerWidget {
         isLabelVisible: !isSyncing && pendingCount > 0,
         label: Text('$pendingCount'),
         child: isSyncing
-            ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.onSurfaceVariant),
-              )
-            : Icon(Icons.cloud_sync_outlined, color: theme.colorScheme.onSurfaceVariant),
+            ? CupertinoActivityIndicator(radius: 9, color: theme.colorScheme.onSurfaceVariant)
+            : Icon(AppIcons.sync, color: theme.colorScheme.onSurfaceVariant),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,7 +21,7 @@ class ReviewScreen extends ConsumerWidget {
     final state = ref.watch(examSessionControllerProvider(sessionKey)).valueOrNull;
 
     if (state == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CupertinoActivityIndicator(radius: 14)));
     }
 
     final theme = Theme.of(context);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme_extension.dart';
@@ -95,13 +96,14 @@ class QuestionCard extends StatelessWidget {
                 Expanded(child: Text(question.body, style: theme.textTheme.bodyLarge)),
                 if (onToggleBookmark != null)
                   IconButton(
-                    icon: Icon(isBookmarked ? Icons.bookmark : Icons.bookmark_outline),
+                    icon: Icon(isBookmarked ? AppIcons.bookmarkSelected : AppIcons.bookmark),
                     color: isBookmarked ? theme.colorScheme.primary : null,
+                    tooltip: isBookmarked ? 'Remove bookmark' : 'Bookmark this question',
                     onPressed: onToggleBookmark,
                   ),
                 if (onAskAi != null)
                   IconButton(
-                    icon: const Icon(Icons.auto_awesome),
+                    icon: const Icon(AppIcons.sparkles),
                     tooltip: 'Ask Shepherd about this question',
                     onPressed: onAskAi,
                   ),
@@ -251,11 +253,11 @@ class _OptionTile extends StatelessWidget {
       case _OptionStatus.correct:
         borderColor = context.appColors.success;
         fillColor = context.appColors.success.withValues(alpha: 0.08);
-        trailingIcon = Icons.check_circle;
+        trailingIcon = AppIcons.success;
       case _OptionStatus.wrong:
         borderColor = theme.colorScheme.error;
         fillColor = theme.colorScheme.error.withValues(alpha: 0.08);
-        trailingIcon = Icons.cancel;
+        trailingIcon = AppIcons.error;
       case _OptionStatus.neutral:
         if (selected) {
           borderColor = theme.colorScheme.primary;

@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:confetti/confetti.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/services/review_prompt_service.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme_extension.dart';
@@ -54,11 +57,13 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     final result = state?.result;
 
     if (result == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CupertinoActivityIndicator(radius: 14)));
     }
 
     final theme = Theme.of(context);
     final percent = result.maxScore > 0 ? (result.score / result.maxScore * 100).clamp(0, 100) : 0.0;
+    final isCelebration = percent >= _celebrationThresholdPercent;
+    final ringColor = isCelebration ? AppColors.gold500 : theme.colorScheme.primary;
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeCelebrate(percent));
 
@@ -87,12 +92,16 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                                 value: percent / 100,
                                 strokeWidth: 10,
                                 backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                                valueColor: AlwaysStoppedAnimation(ringColor),
                               ),
                             ),
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('${percent.toStringAsFixed(1)}%', style: theme.textTheme.headlineMedium),
+                                Text(
+                                  '${percent.toStringAsFixed(1)}%',
+                                  style: theme.textTheme.headlineMedium?.copyWith(color: ringColor),
+                                ),
                                 Text(
                                   '${result.score.toStringAsFixed(1)} / ${result.maxScore.toStringAsFixed(0)}',
                                   style: theme.textTheme.bodyMedium,
@@ -113,7 +122,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.cloud_off_rounded, size: 16, color: theme.colorScheme.onTertiaryContainer),
+                              Icon(AppIcons.offline, size: 16, color: theme.colorScheme.onTertiaryContainer),
                               const SizedBox(width: AppSpacing.xs),
                               Flexible(
                                 child: Text(
@@ -188,7 +197,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 const SizedBox(height: AppSpacing.lg),
                 AppButton(
                   label: 'Review Answers',
-                  icon: Icons.fact_check_outlined,
+                  icon: AppIcons.factCheck,
                   onPressed: () => context.push('/cbt/exam/${widget.sessionKey}/review'),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -206,6 +215,13 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 shouldLoop: false,
                 numberOfParticles: 24,
                 gravity: 0.3,
+                colors: const [
+                  AppColors.gold400,
+                  AppColors.gold600,
+                  AppColors.blue400,
+                  AppColors.blue600,
+                  AppColors.neutral0,
+                ],
               ),
             ),
           ],

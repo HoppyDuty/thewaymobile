@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -28,7 +29,7 @@ class ExamTypesScreen extends ConsumerWidget {
         actions: [
           const SyncBadge(),
           IconButton(
-            icon: const Icon(Icons.bookmark_outline),
+            icon: const Icon(AppIcons.bookmark),
             tooltip: 'My Questions',
             onPressed: () => context.push('/cbt/bookmarks'),
           ),
@@ -55,10 +56,10 @@ class ExamTypesScreen extends ConsumerWidget {
             return AppEmptyState(
               title: 'No exam types synced yet',
               message: 'Connect to the internet once to download the question bank — after that it works offline.',
-              icon: Icons.quiz_outlined,
+              icon: AppIcons.quiz,
               action: OutlinedButton.icon(
                 onPressed: () => ref.read(examTypesControllerProvider.notifier).refresh(),
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(AppIcons.refresh),
                 label: const Text('Sync now'),
               ),
             );

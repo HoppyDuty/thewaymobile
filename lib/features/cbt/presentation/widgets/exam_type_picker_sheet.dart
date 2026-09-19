@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -65,14 +66,14 @@ class _ExamTypePickerSheet extends ConsumerWidget {
                   error: (error, _) => const AppEmptyState(
                     title: 'Could not load exam types',
                     message: 'Connect to the internet at least once to sync the question bank.',
-                    icon: Icons.wifi_off_rounded,
+                    icon: AppIcons.offline,
                   ),
                   data: (examTypes) {
                     if (examTypes.isEmpty) {
                       return const AppEmptyState(
                         title: 'No exam types synced yet',
                         message: 'Connect to the internet at least once to sync the question bank.',
-                        icon: Icons.quiz_outlined,
+                        icon: AppIcons.quiz,
                       );
                     }
                     return ListView.builder(
@@ -107,7 +108,7 @@ class _ExamTypeRow extends StatelessWidget {
       ),
       title: Text(examType.name),
       subtitle: Text('${examType.subjects.length} subjects'),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: const Icon(AppIcons.chevronRight),
       onTap: () {
         Navigator.of(context).pop();
         context.push('/cbt/subjects', extra: CbtFlowArgs(examType: examType, mode: ExamMode.topical));

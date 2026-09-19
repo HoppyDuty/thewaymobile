@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
 import '../../../../core/storage/hive_setup.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -41,7 +42,7 @@ class BookmarksScreen extends ConsumerWidget {
             return const AppEmptyState(
               title: 'No bookmarked questions yet',
               message: 'Tap the bookmark icon on any question during an exam to save it here.',
-              icon: Icons.bookmark_outline,
+              icon: AppIcons.bookmark,
             );
           }
 

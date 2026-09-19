@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../payments/data/models/payment_models.dart';
@@ -60,7 +61,7 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
               shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
               child: ListTile(
                 shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
-                leading: Icon(Icons.lock_open_rounded, color: theme.colorScheme.onTertiaryContainer),
+                leading: Icon(AppIcons.unlock, color: theme.colorScheme.onTertiaryContainer),
                 title: Text(
                   'Unlock Full Access — ₦${examType.price.toStringAsFixed(0)}',
                   style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
@@ -69,7 +70,7 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
                   'Free practice is limited to 5 questions per subject.',
                   style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onTertiaryContainer),
                 ),
-                trailing: const Icon(Icons.chevron_right),
+                trailing: const Icon(AppIcons.chevronRight),
                 onTap: _unlock,
               ),
             ),
@@ -93,7 +94,7 @@ class _ModeSelectionScreenState extends ConsumerState<ModeSelectionScreen> {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(info.description),
                   ),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: const Icon(AppIcons.chevronRight),
                   onTap: () =>
                       context.push('/cbt/subjects', extra: CbtFlowArgs(examType: examType, mode: info.mode)),
                 ),

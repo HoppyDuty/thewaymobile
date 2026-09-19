@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_icons.dart';
 import '../../data/models/exam_type_model.dart';
 import '../../data/models/offline_session_model.dart';
 
@@ -48,31 +49,31 @@ class ExamModeInfo {
       mode: ExamMode.standard,
       title: 'Standard Exam',
       description: 'Full timed mock exam with the real subject count and duration for this exam type.',
-      icon: Icons.assignment_turned_in_outlined,
+      icon: AppIcons.checklist,
     ),
     ExamModeInfo(
       mode: ExamMode.yearly,
       title: 'Yearly (Past Questions)',
       description: "A full timed exam built entirely from one past year's real questions.",
-      icon: Icons.history_edu_outlined,
+      icon: AppIcons.history,
     ),
     ExamModeInfo(
       mode: ExamMode.practice,
       title: 'Practice',
       description: 'Choose your own question count and an optional timer — great for quick drills.',
-      icon: Icons.fitness_center_outlined,
+      icon: AppIcons.practice,
     ),
     ExamModeInfo(
       mode: ExamMode.study,
       title: 'Study Mode',
       description: 'Untimed, questions in a fixed order — work through a subject at your own pace.',
-      icon: Icons.school_outlined,
+      icon: AppIcons.book,
     ),
     ExamModeInfo(
       mode: ExamMode.topical,
       title: 'Topical Study',
       description: 'Pick one subject and one topic and drill just that area, untimed.',
-      icon: Icons.topic_outlined,
+      icon: AppIcons.topic,
     ),
   ];
 }

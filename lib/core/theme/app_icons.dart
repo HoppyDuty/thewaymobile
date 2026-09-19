@@ -34,6 +34,9 @@ abstract final class AppIcons {
   static const IconData bookmarkSelected = CupertinoIcons.bookmark_fill;
   static const IconData download = CupertinoIcons.arrow_down_circle;
   static const IconData downloadDone = CupertinoIcons.checkmark_circle_fill;
+  static const IconData checklist = CupertinoIcons.doc_on_clipboard;
+  static const IconData history = CupertinoIcons.hourglass;
+  static const IconData practice = CupertinoIcons.flame;
 
   // ─── Chrome / actions ───────────────────────────────────────────────────
   static const IconData search = CupertinoIcons.search;
@@ -47,10 +50,18 @@ abstract final class AppIcons {
   static const IconData logout = CupertinoIcons.square_arrow_right;
   static const IconData chevronRight = CupertinoIcons.chevron_right;
   static const IconData sparkles = CupertinoIcons.sparkles;
+  static const IconData refresh = CupertinoIcons.refresh;
+  static const IconData unlock = CupertinoIcons.lock_open;
+  static const IconData play = CupertinoIcons.play_fill;
+  static const IconData list = CupertinoIcons.list_bullet;
+  static const IconData calculator = CupertinoIcons.number_square;
+  static const IconData factCheck = CupertinoIcons.doc_checkmark;
+  static const IconData sync = CupertinoIcons.arrow_2_circlepath;
 
   // ─── Status ─────────────────────────────────────────────────────────────
   static const IconData offline = CupertinoIcons.wifi_slash;
   static const IconData success = CupertinoIcons.checkmark_circle;
   static const IconData warning = CupertinoIcons.exclamationmark_triangle;
   static const IconData error = CupertinoIcons.xmark_circle;
+  static const IconData quiz = CupertinoIcons.question_circle;
 }

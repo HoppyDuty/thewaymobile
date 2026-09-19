@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/storage/hive_setup.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../data/models/offline_session_model.dart';
@@ -197,7 +198,7 @@ class _SessionSetupScreenState extends ConsumerState<SessionSetupScreen> {
           ),
           SafeArea(
             minimum: const EdgeInsets.all(AppSpacing.md),
-            child: AppButton(label: 'Start Exam', onPressed: _startExam, icon: Icons.play_arrow_rounded),
+            child: AppButton(label: 'Start Exam', onPressed: _startExam, icon: AppIcons.play),
           ),
         ],
       ),

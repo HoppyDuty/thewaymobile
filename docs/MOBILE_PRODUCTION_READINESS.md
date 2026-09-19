@@ -168,6 +168,55 @@ the icon-migration pattern now established for future screens to follow.
 
 ---
 
+## Milestone 4 — CBT icon migration (exam flow + widgets)
+
+### What changed
+- `lib/core/theme/app_icons.dart` — extended with the glyphs CBT needed:
+  `refresh`, `unlock`, `play`, `list`, `calculator` (`CupertinoIcons.number_square` — Cupertino's
+  icon font has no literal calculator glyph, this is the closest one-system stand-in), `factCheck`,
+  `sync`, `quiz`, plus content icons `checklist`, `history`, `practice` for the exam-mode cards.
+  Cross-checked every new mapping against `flutter/src/cupertino/icons.dart` directly (not
+  guessed) before wiring it in.
+- All 9 CBT screens (`exam_types_screen`, `mode_selection_screen`, `subject_selection_screen` —
+  no icons needed, `topic_selection_screen`, `session_setup_screen`, `exam_screen`,
+  `result_screen`, `review_screen`, `bookmarks_screen`) and 5 widgets
+  (`question_card`, `exam_type_picker_sheet`, `sync_badge`, plus `cbt_flow_args.dart`'s
+  `ExamModeInfo` icons — `calculator_sheet`/`ios_number_picker` had no `Icons.*` to migrate) moved
+  off raw `Icons.*` onto `AppIcons.*`. This is the CBT slice of Remaining-work item 8.
+- **Loading states corrected to §6 Level 2**: `exam_screen.dart` (initial session load + the
+  brief transition into the result screen), `result_screen.dart` (waiting on the result to land
+  in state), `review_screen.dart` (waiting on session state) all used a bare Material
+  `CircularProgressIndicator()` for what is a short, near-instant local-computation wait (CBT
+  reads from Hive, not network) — switched to `CupertinoActivityIndicator`, matching the pattern
+  `AppButton` already established. `SyncBadge`'s small in-progress spinner got the same fix.
+- **Added the bookmark toggle's missing accessibility label** on `QuestionCard` (§14 — every
+  interactive icon needs a semantic label, this one had none before).
+- **Restrained gold "achievement" accent** on `ResultScreen` (`UI_UX_RULES.md` §2 — gold is
+  reserved for celebration moments, this is a real one): when the score crosses the existing
+  70%-celebration threshold (`_celebrationThresholdPercent`, already used to trigger confetti),
+  the score ring and percentage text switch from `colorScheme.primary` to `AppColors.gold500`,
+  and the confetti burst now uses the brand blue/gold palette explicitly instead of the
+  `confetti` package's random default colors. Below the threshold, nothing changed — still
+  primary blue, no gold anywhere else in CBT.
+
+### Verification performed
+- `flutter analyze lib/features/cbt lib/core/theme/app_icons.dart` — **VERIFIED**, 0 issues.
+- `flutter analyze` (whole project) — **VERIFIED**, only the 3 pre-existing unrelated issues
+  from Milestone 1 (2 `Radio` deprecation warnings in `payment_sheet.dart`, the expected missing
+  `.env` asset warning).
+- **NOT VERIFIED**: visual appearance (gold ring/confetti coloring, new icon glyphs, calculator
+  icon substitution) on a real device — no emulator available in this environment.
+
+### Not touched in this pass
+CBT's offline engine (`cbt_sync_service.dart`, `offline_queue_service.dart`,
+`local_scoring_service.dart`, `offline_question_builder.dart`) — already correct per the
+Milestone 1 architecture audit, not part of a visual/icon pass. No new widgets were introduced;
+this was polish on the existing, already-solid screen structure (all 9 screens were already
+using `AppSpacing`/`AppRadius`/theme-role colors correctly — the gap was specifically icons,
+loading-indicator level, and the missing celebration accent).
+
+---
+
 ## Architecture inventory (confirmed by direct code audit, not assumed)
 
 **Screens:** 48 distinct screens/dialogs/sheets across 13 features (auth, home, CBT, video,
@@ -208,16 +257,21 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
    migrate to `AppIcons`.
 2. **Home screen** — rebuild section widgets (carousel, quick actions, continue-learning,
    leaderboard, news preview) for visual polish; migrate icons.
-3. **CBT** — visual rebuild of exam-type/mode/subject/topic selection, the exam-taking screen
-   itself (highest-stakes UX in the app), results/review/bookmarks.
+3. ~~**CBT** — visual rebuild of exam-type/mode/subject/topic selection, the exam-taking screen
+   itself (highest-stakes UX in the app), results/review/bookmarks.~~ — **DONE** (Milestone 4):
+   the flow's structure/tokens/accessibility were already solid (confirmed by direct audit, not
+   assumed), so this landed as icon migration + loading-state-level correction + a gold
+   celebration accent, not a ground-up rebuild — see Milestone 4 for the reasoning.
 4. **Videos** — listing/detail/player/downloads visual rebuild.
 5. **Books** — listing/detail/reader/saved visual rebuild.
 6. **Profile** — hub + edit/stats/purchases/payments/preferences visual rebuild.
 7. **Onboarding** — verify Rive assets actually exist and render (research flagged
    `assets/rive/` contains only a `.gitkeep`, no real `.riv` files — the onboarding screen may
    currently be silently falling back to a plain icon).
-8. **Icon migration** — move the remaining ~150 `Icons.*` call sites onto `AppIcons`,
-   expanding the mapping as needed per screen.
+8. **Icon migration** — move the remaining `Icons.*` call sites onto `AppIcons`, expanding the
+   mapping as needed per screen. CBT's ~20 sites done in Milestone 4; still open across
+   Videos/Books/Profile/onboarding/shell/core widgets — recount at the start of that pass since
+   Milestones 3 and 4 already reduced the original ~150 estimate.
 9. **Offline-architecture work** described in `UI_UX_RULES.md` §11: app-wide reconnect
    listening (not gated behind visiting the CBT tab), stale-while-revalidate caching for
    Home/Videos/Books/News, a basic cache for Profile.
