@@ -41,6 +41,19 @@ class NotificationsApi {
     }
   }
 
+  /// Synchronous read of the cached page-1 list (if any, within
+  /// [OfflineCache.maxAge]) — lets [NotificationsController] paint it
+  /// immediately and revalidate in the background, same role as
+  /// `HomeApi.readCachedHomeScreen`.
+  ({List<NotificationModel> items, int unreadCount})? readCachedList() {
+    final cached = _cache.read('notifications_list');
+    if (cached == null) return null;
+    final map = Map<String, dynamic>.from(cached.data as Map);
+    final items =
+        (map['items'] as List).map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+    return (items: items, unreadCount: map['unread_count'] as int? ?? 0);
+  }
+
   Future<void> markRead(int id) => _client.patch('/notifications/$id/read');
 
   Future<void> markAllRead() => _client.post('/notifications/read-all');

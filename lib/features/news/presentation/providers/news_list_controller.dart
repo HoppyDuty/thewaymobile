@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/storage/stale_while_revalidate.dart';
 import '../../data/models/news_summary.dart';
 import '../../data/news_api.dart';
 
@@ -28,8 +29,18 @@ class NewsListController extends _$NewsListController {
   @override
   Future<NewsListState> build() async {
     _page = 1;
-    final result = await ref.watch(newsApiProvider).list(page: _page);
-    return NewsListState(items: result.items, hasMore: result.meta.hasMore);
+    final api = ref.watch(newsApiProvider);
+    final cachedItems = api.readCachedList();
+    return seedAndRevalidate(
+      // hasMore is conservatively false for the cached seed (no cached
+      // pagination meta) — the revalidate below corrects it moments later.
+      cached: cachedItems == null ? null : NewsListState(items: cachedItems, hasMore: false),
+      fetch: () async {
+        final result = await api.list(page: _page);
+        return NewsListState(items: result.items, hasMore: result.meta.hasMore);
+      },
+      onRevalidated: (v) => state = AsyncData(v),
+    );
   }
 
   Future<void> loadMore() async {

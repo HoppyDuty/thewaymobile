@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/storage/stale_while_revalidate.dart';
 import '../../data/models/profile_models.dart';
 import '../../data/profile_api.dart';
 
@@ -9,7 +10,12 @@ part 'profile_controller.g.dart';
 class ProfileController extends _$ProfileController {
   @override
   Future<FullProfile> build() {
-    return ref.watch(profileApiProvider).getFullProfile();
+    final api = ref.watch(profileApiProvider);
+    return seedAndRevalidate(
+      cached: api.readCachedFullProfile(),
+      fetch: api.getFullProfile,
+      onRevalidated: (v) => state = AsyncData(v),
+    );
   }
 
   Future<void> refresh() async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'app_reconnect_coordinator.dart';
 import 'core/notifications/snackbar_service.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
@@ -15,6 +16,10 @@ class TheWayApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
     final snackbarService = ref.watch(snackbarServiceProvider);
     final themeMode = ref.watch(themeModeControllerProvider);
+    // AppReconnectCoordinator is `keepAlive: true` but still lazy until
+    // something watches it — without this, it's defined but never actually
+    // instantiated, so it silently never fires. This is that one watch.
+    ref.watch(appReconnectCoordinatorProvider);
 
     return MaterialApp.router(
       title: 'The Way',

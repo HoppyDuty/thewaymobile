@@ -36,6 +36,15 @@ class HomeApi {
     }
   }
 
+  /// Synchronous read of the last cached home payload (if any, within
+  /// [OfflineCache.maxAge]) — lets [HomeController] paint it immediately
+  /// and revalidate in the background instead of waiting on the network.
+  HomeScreenData? readCachedHomeScreen() {
+    final cached = _cache.read(_homeScreenCacheKey);
+    if (cached == null) return null;
+    return HomeScreenData.fromJson(Map<String, dynamic>.from(cached.data as Map));
+  }
+
   Future<List<ContinueLearningItem>> getContinueLearning() async {
     final data = await _client.get('/home/continue-learning');
     return (data!['items'] as List<dynamic>)
@@ -69,6 +78,14 @@ class HomeApi {
       if (cached == null) rethrow;
       return Leaderboard.fromJson(Map<String, dynamic>.from(cached.data as Map));
     }
+  }
+
+  /// See [readCachedHomeScreen] — same immediate-paint role for
+  /// [LeaderboardController].
+  Leaderboard? readCachedLeaderboard() {
+    final cached = _cache.read(_leaderboardCacheKey);
+    if (cached == null) return null;
+    return Leaderboard.fromJson(Map<String, dynamic>.from(cached.data as Map));
   }
 }
 

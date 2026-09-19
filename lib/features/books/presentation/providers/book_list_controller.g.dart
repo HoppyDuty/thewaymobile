@@ -7,7 +7,7 @@ part of 'book_list_controller.dart';
 // **************************************************************************
 
 String _$bookListControllerHash() =>
-    r'32a54e0de4b9a260646587b49fac2b51deed96db';
+    r'79e0b1ec5483a9419227b22d0793bcd45c34f58d';
 
 /// Copied from Dart SDK
 class _SystemHash {

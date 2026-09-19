@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/storage/stale_while_revalidate.dart';
 import '../../data/models/video_course_summary.dart';
 import '../../data/video_api.dart';
 
@@ -31,8 +32,18 @@ class VideoCoursesController extends _$VideoCoursesController {
   @override
   Future<VideoCoursesState> build(int? categoryId) async {
     _page = 1;
-    final result = await ref.watch(videoApiProvider).listCourses(page: _page, categoryId: categoryId);
-    return VideoCoursesState(items: result.items, hasMore: result.meta.hasMore);
+    final api = ref.watch(videoApiProvider);
+    final cachedPage = api.readCachedCourses(categoryId);
+    return seedAndRevalidate(
+      cached: cachedPage == null
+          ? null
+          : VideoCoursesState(items: cachedPage.items, hasMore: cachedPage.meta.hasMore),
+      fetch: () async {
+        final result = await api.listCourses(page: _page, categoryId: categoryId);
+        return VideoCoursesState(items: result.items, hasMore: result.meta.hasMore);
+      },
+      onRevalidated: (v) => state = AsyncData(v),
+    );
   }
 
   Future<void> loadMore() async {

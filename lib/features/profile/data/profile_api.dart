@@ -2,10 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_exception.dart';
 import '../../../core/network/page_meta.dart';
+import '../../../core/storage/offline_cache.dart';
 import 'models/profile_models.dart';
 
 part 'profile_api.g.dart';
+
+const _fullProfileCacheKey = 'profile_full';
 
 class PaymentHistoryPage {
   const PaymentHistoryPage({required this.items, required this.meta});
@@ -14,13 +18,36 @@ class PaymentHistoryPage {
 }
 
 class ProfileApi {
-  ProfileApi(this._client);
+  ProfileApi(this._client, this._cache);
 
   final ApiClient _client;
+  final OfflineCache _cache;
 
+  /// Network-first, falling back to the last cached copy (kept for
+  /// [OfflineCache.maxAge]) if there's no connection — Profile previously
+  /// had no offline story at all (`UI_UX_RULES.md` §11's "give Profile at
+  /// least a basic cache"), so this brings it to parity with Home/Videos/
+  /// Books/News's baseline.
   Future<FullProfile> getFullProfile() async {
-    final data = await _client.get('/profile');
-    return FullProfile.fromJson(data!);
+    try {
+      final data = await _client.get('/profile');
+      await _cache.write(_fullProfileCacheKey, data!);
+      return FullProfile.fromJson(data);
+    } on ApiException catch (e) {
+      if (!e.isNetworkError) rethrow;
+      final cached = _cache.read(_fullProfileCacheKey);
+      if (cached == null) rethrow;
+      return FullProfile.fromJson(Map<String, dynamic>.from(cached.data as Map));
+    }
+  }
+
+  /// Synchronous read of the cached profile — lets [ProfileController]
+  /// paint immediately and revalidate in the background, same role as
+  /// `HomeApi.readCachedHomeScreen`.
+  FullProfile? readCachedFullProfile() {
+    final cached = _cache.read(_fullProfileCacheKey);
+    if (cached == null) return null;
+    return FullProfile.fromJson(Map<String, dynamic>.from(cached.data as Map));
   }
 
   Future<UserStats> getStats() async {
@@ -95,4 +122,5 @@ class ProfileApi {
 }
 
 @Riverpod(keepAlive: true)
-ProfileApi profileApi(ProfileApiRef ref) => ProfileApi(ref.watch(apiClientProvider));
+ProfileApi profileApi(ProfileApiRef ref) =>
+    ProfileApi(ref.watch(apiClientProvider), ref.watch(offlineCacheProvider));

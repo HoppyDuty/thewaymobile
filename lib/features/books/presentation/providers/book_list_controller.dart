@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/storage/stale_while_revalidate.dart';
 import '../../data/book_api.dart';
 import '../../data/models/book_summary.dart';
 
@@ -34,8 +35,16 @@ class BookListController extends _$BookListController {
   @override
   Future<BookListState> build(BookListFilter filter) async {
     _page = 1;
-    final result = await ref.watch(bookApiProvider).listBooks(page: _page, categoryId: filter.categoryId, search: filter.search);
-    return BookListState(items: result.items, hasMore: result.meta.hasMore);
+    final api = ref.watch(bookApiProvider);
+    final cachedPage = api.readCachedBooks(categoryId: filter.categoryId, search: filter.search);
+    return seedAndRevalidate(
+      cached: cachedPage == null ? null : BookListState(items: cachedPage.items, hasMore: cachedPage.meta.hasMore),
+      fetch: () async {
+        final result = await api.listBooks(page: _page, categoryId: filter.categoryId, search: filter.search);
+        return BookListState(items: result.items, hasMore: result.meta.hasMore);
+      },
+      onRevalidated: (v) => state = AsyncData(v),
+    );
   }
 
   Future<void> loadMore() async {

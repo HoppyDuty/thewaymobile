@@ -7,7 +7,7 @@ part of 'video_courses_controller.dart';
 // **************************************************************************
 
 String _$videoCoursesControllerHash() =>
-    r'f232455ebb1cbc54b0c5ac1c3defafc905f0d723';
+    r'cf61c02fb8dac7232231d44e4e6fa7e926f4df39';
 
 /// Copied from Dart SDK
 class _SystemHash {

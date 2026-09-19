@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/storage/stale_while_revalidate.dart';
 import '../../data/models/notification_model.dart';
 import '../../data/notifications_api.dart';
 
@@ -25,10 +26,21 @@ class NotificationsController extends _$NotificationsController {
   int _page = 1;
 
   @override
-  Future<NotificationsState> build() async {
+  Future<NotificationsState> build() {
     _page = 1;
-    final result = await ref.watch(notificationsApiProvider).list(page: 1);
-    return NotificationsState(items: result.items, hasMore: result.meta.hasMore, unreadCount: result.unreadCount);
+    final api = ref.watch(notificationsApiProvider);
+    final cached = api.readCachedList();
+
+    return seedAndRevalidate(
+      cached: cached == null
+          ? null
+          : NotificationsState(items: cached.items, hasMore: false, unreadCount: cached.unreadCount),
+      fetch: () async {
+        final result = await api.list(page: 1);
+        return NotificationsState(items: result.items, hasMore: result.meta.hasMore, unreadCount: result.unreadCount);
+      },
+      onRevalidated: (v) => state = AsyncData(v),
+    );
   }
 
   Future<void> loadMore() async {

@@ -39,7 +39,7 @@ class BookApi {
   }
 
   Future<BookPage> listBooks({int page = 1, int? categoryId, int? authorId, String? search, String sortBy = 'sort_order'}) async {
-    final cacheKey = 'books_page_${page}_cat_${categoryId ?? ''}_auth_${authorId ?? ''}_q_${search ?? ''}_sort_$sortBy';
+    final cacheKey = _booksPageCacheKey(page, categoryId: categoryId, authorId: authorId, search: search, sortBy: sortBy);
     try {
       final envelope = await _client.getPage(
         '/books',
@@ -65,6 +65,23 @@ class BookApi {
       return BookPage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
     }
   }
+
+  /// Synchronous read of the cached first page for this filter — lets
+  /// [BookListController] paint immediately and revalidate in the
+  /// background (`UI_UX_RULES.md` §11), same role as
+  /// `HomeApi.readCachedHomeScreen`.
+  BookPage? readCachedBooks({int? categoryId, int? authorId, String? search, String sortBy = 'sort_order'}) {
+    final cached = _cache.read(
+      _booksPageCacheKey(1, categoryId: categoryId, authorId: authorId, search: search, sortBy: sortBy),
+    );
+    if (cached == null) return null;
+    final map = Map<String, dynamic>.from(cached.data as Map);
+    final items = (map['items'] as List<dynamic>).map((b) => BookSummary.fromJson(Map<String, dynamic>.from(b))).toList();
+    return BookPage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+  }
+
+  String _booksPageCacheKey(int page, {int? categoryId, int? authorId, String? search, String sortBy = 'sort_order'}) =>
+      'books_page_${page}_cat_${categoryId ?? ''}_auth_${authorId ?? ''}_q_${search ?? ''}_sort_$sortBy';
 
   Future<BookDetail> getBook(String slug) async {
     final cacheKey = 'book_$slug';

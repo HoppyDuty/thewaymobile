@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/storage/stale_while_revalidate.dart';
 import '../../data/home_api.dart';
 import '../../data/models/home_screen.dart';
 
@@ -9,7 +10,12 @@ part 'home_controller.g.dart';
 class HomeController extends _$HomeController {
   @override
   Future<HomeScreenData> build() {
-    return ref.watch(homeApiProvider).getHomeScreen();
+    final api = ref.watch(homeApiProvider);
+    return seedAndRevalidate(
+      cached: api.readCachedHomeScreen(),
+      fetch: api.getHomeScreen,
+      onRevalidated: (v) => state = AsyncData(v),
+    );
   }
 
   /// Deliberately doesn't set an intermediate loading state — the old data

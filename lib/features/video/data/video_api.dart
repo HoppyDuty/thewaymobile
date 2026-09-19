@@ -39,7 +39,7 @@ class VideoApi {
   }
 
   Future<VideoCoursePage> listCourses({int page = 1, int? categoryId}) async {
-    final cacheKey = 'video_courses_page_${page}_cat_${categoryId ?? ''}';
+    final cacheKey = _coursesPageCacheKey(page, categoryId);
     try {
       final envelope = await _client.getPage(
         '/videos',
@@ -59,6 +59,21 @@ class VideoApi {
       return VideoCoursePage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
     }
   }
+
+  /// Synchronous read of the cached first page for [categoryId] — lets
+  /// [VideoCoursesController] paint immediately and revalidate in the
+  /// background (`UI_UX_RULES.md` §11), same role as
+  /// `HomeApi.readCachedHomeScreen`.
+  VideoCoursePage? readCachedCourses(int? categoryId) {
+    final cached = _cache.read(_coursesPageCacheKey(1, categoryId));
+    if (cached == null) return null;
+    final map = Map<String, dynamic>.from(cached.data as Map);
+    final items =
+        (map['items'] as List<dynamic>).map((c) => VideoCourseSummary.fromJson(Map<String, dynamic>.from(c))).toList();
+    return VideoCoursePage(items: items, meta: PageMeta.fromJson(map['meta'] as Map<String, dynamic>?));
+  }
+
+  String _coursesPageCacheKey(int page, int? categoryId) => 'video_courses_page_${page}_cat_${categoryId ?? ''}';
 
   Future<VideoCourseDetail> getCourse(String slug) async {
     final cacheKey = 'video_course_$slug';

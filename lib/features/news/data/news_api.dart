@@ -38,6 +38,15 @@ class NewsApi {
     }
   }
 
+  /// Synchronous read of the cached first page — lets [NewsListController]
+  /// paint immediately and revalidate in the background (`UI_UX_RULES.md`
+  /// §11), same role as `HomeApi.readCachedHomeScreen`.
+  List<NewsSummary>? readCachedList() {
+    final cached = _cache.read('news_list');
+    if (cached == null) return null;
+    return (cached.data as List).map((e) => NewsSummary.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+  }
+
   Future<NewsArticleDetail> getArticle(String slug) async {
     try {
       final data = await _client.get('/news/$slug');
