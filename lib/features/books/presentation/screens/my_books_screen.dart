@@ -70,6 +70,22 @@ class _SavedBookTile extends ConsumerWidget {
   final SavedBookModel book;
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove saved book?'),
+        content: Text('"${book.title}" will be deleted from this device. You can save it offline again later.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Remove', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
     await ref.read(bookDownloadControllerProvider(book.bookId).notifier).delete();
     ref.invalidate(localSavedBooksProvider);
     if (context.mounted) {

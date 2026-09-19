@@ -49,6 +49,22 @@ class _ShepherdHomeScreenState extends ConsumerState<ShepherdHomeScreen> {
   }
 
   Future<void> _delete(String uuid) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete conversation?'),
+        content: const Text('This cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Delete', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
     try {
       await ref.read(conversationsControllerProvider.notifier).delete(uuid);
     } catch (e) {
@@ -198,7 +214,7 @@ class _ConversationTile extends StatelessWidget {
               : '${conversation.messageCount} messages',
           style: theme.textTheme.bodySmall,
         ),
-        trailing: IconButton(icon: const Icon(AppIcons.delete), onPressed: onDelete),
+        trailing: IconButton(icon: const Icon(AppIcons.delete), tooltip: 'Delete conversation', onPressed: onDelete),
         onTap: () => context.push('/shepherd/chat/${conversation.uuid}'),
       ),
     );

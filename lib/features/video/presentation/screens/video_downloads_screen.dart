@@ -77,6 +77,22 @@ class _DownloadTile extends ConsumerWidget {
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove download?'),
+        content: Text('"${video.title}" will be deleted from this device. You can download it again later.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Remove', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
     await ref.read(videoDownloadControllerProvider(video.lessonId).notifier).delete();
     ref.invalidate(localVideoDownloadsProvider);
     if (context.mounted) {
