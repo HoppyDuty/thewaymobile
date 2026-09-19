@@ -11,7 +11,11 @@ import 'package:flutter/material.dart';
 /// role doesn't cover: a specific shade for a badge fill, a chip border, a
 /// gold accent on a light card, etc. — see `docs/UI_UX_RULES.md` §2-3.
 abstract final class AppColors {
-  static const Color brandBlue = Color(0xFF1A237E);
+  // Was 0xFF1A237E — a dark indigo that reads as purple at a glance despite
+  // being coded/documented as "blue". Replaced with Material Blue 800, an
+  // unambiguously blue, accessible anchor (see the blue50-900 ramp below,
+  // Material's own Blue palette) — same brand role, clearer hue.
+  static const Color brandBlue = Color(0xFF1565C0);
   static const Color brandGold = Color(0xFFD4AF37);
 
   static const Color success = Color(0xFF2E7D32);
@@ -19,17 +23,17 @@ abstract final class AppColors {
   static const Color danger = Color(0xFFC62828);
   static const Color info = Color(0xFF0288D1);
 
-  // ─── Blue tonal ramp (seeded from brandBlue = blue700) ────────────────────
-  static const Color blue50 = Color(0xFFEAECF9);
-  static const Color blue100 = Color(0xFFC5CBEE);
-  static const Color blue200 = Color(0xFF9BA6E1);
-  static const Color blue300 = Color(0xFF6E7DD3);
-  static const Color blue400 = Color(0xFF4759C7);
-  static const Color blue500 = Color(0xFF2739BC);
-  static const Color blue600 = Color(0xFF2030A8);
-  static const Color blue700 = brandBlue; // 0xFF1A237E
-  static const Color blue800 = Color(0xFF131A63);
-  static const Color blue900 = Color(0xFF0D1247);
+  // ─── Blue tonal ramp (Material Blue palette, seeded from brandBlue = blue800) ──
+  static const Color blue50 = Color(0xFFE3F2FD);
+  static const Color blue100 = Color(0xFFBBDEFB);
+  static const Color blue200 = Color(0xFF90CAF9);
+  static const Color blue300 = Color(0xFF64B5F6);
+  static const Color blue400 = Color(0xFF42A5F5);
+  static const Color blue500 = Color(0xFF2196F3);
+  static const Color blue600 = Color(0xFF1E88E5);
+  static const Color blue700 = Color(0xFF1976D2);
+  static const Color blue800 = brandBlue; // 0xFF1565C0
+  static const Color blue900 = Color(0xFF0D47A1);
 
   // ─── Gold tonal ramp (seeded from brandGold = gold500) ─────────────────────
   static const Color gold50 = Color(0xFFFBF6E8);

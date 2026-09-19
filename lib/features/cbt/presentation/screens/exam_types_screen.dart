@@ -37,12 +37,12 @@ class ExamTypesScreen extends ConsumerWidget {
       ),
       body: state.when(
         loading: () => AppShimmer(
-          child: GridView.builder(
+          child: ListView.builder(
             padding: const EdgeInsets.all(AppSpacing.md),
-            gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: AppSpacing.md, crossAxisSpacing: AppSpacing.md, childAspectRatio: 0.95),
-            itemCount: 6,
+            itemCount: 5,
             itemBuilder: (context, index) => Container(
+              height: 88,
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
               decoration: BoxDecoration(color: Colors.white, borderRadius: AppRadius.lgRadius),
             ),
           ),
@@ -67,14 +67,8 @@ class ExamTypesScreen extends ConsumerWidget {
 
           return RefreshIndicator(
             onRefresh: () => ref.read(examTypesControllerProvider.notifier).refresh(),
-            child: GridView.builder(
+            child: ListView.builder(
               padding: const EdgeInsets.all(AppSpacing.md),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: AppSpacing.md,
-                crossAxisSpacing: AppSpacing.md,
-                childAspectRatio: 0.95,
-              ),
               itemCount: examTypes.length,
               itemBuilder: (context, index) => _ExamTypeCard(examType: examTypes[index]),
             ),
@@ -85,6 +79,10 @@ class ExamTypesScreen extends ConsumerWidget {
   }
 }
 
+/// A full-width, identity-first row: logo, name, short description — no
+/// subject count, price, or other metadata that doesn't help the user
+/// recognize *which* exam type this is (spec: CBT Practice cards communicate
+/// identity/purpose, not stats).
 class _ExamTypeCard extends StatelessWidget {
   const _ExamTypeCard({required this.examType});
 
@@ -96,44 +94,42 @@ class _ExamTypeCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
       child: InkWell(
         onTap: () => context.push('/cbt/mode', extra: examType),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: AppNetworkImage(url: examType.imageUrl),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    examType.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${examType.subjects.length} subjects',
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  ),
-                  if (examType.price > 0) ...[
-                    const SizedBox(height: 4),
-                    Chip(
-                      visualDensity: VisualDensity.compact,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      label: Text('₦${examType.price.toStringAsFixed(0)}'),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              AppNetworkImage(url: examType.imageUrl, width: 56, height: 56, borderRadius: AppRadius.mdRadius),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      examType.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
                     ),
+                    if ((examType.description ?? '').isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        examType.description!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.sm),
+              Icon(AppIcons.chevronRight, color: theme.colorScheme.outline),
+            ],
+          ),
         ),
       ),
     );

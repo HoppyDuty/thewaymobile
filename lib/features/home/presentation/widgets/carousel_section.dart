@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,12 +18,61 @@ class CarouselSection extends StatefulWidget {
   State<CarouselSection> createState() => _CarouselSectionState();
 }
 
-class _CarouselSectionState extends State<CarouselSection> {
-  final _controller = PageController(viewportFraction: 0.92);
+/// Auto-advances one slide at a time on [_autoScrollInterval], pausing
+/// while the user is dragging (or the app is backgrounded) and resuming
+/// after. Looping is seamless — rather than a finite `PageView` that snaps
+/// back to page 0 on wraparound, the controller starts deep into a
+/// virtually-infinite page range and every index is taken mod
+/// `slides.length`, so `nextPage()` never needs to jump backwards.
+class _CarouselSectionState extends State<CarouselSection> with WidgetsBindingObserver {
+  static const _autoScrollInterval = Duration(seconds: 5);
+  static const _autoScrollAnimation = Duration(milliseconds: 450);
+  // Large enough to swipe backwards indefinitely without hitting page 0
+  // for any realistic session length, small enough to stay a plain int.
+  static const _initialPageOffset = 5000;
+
+  late final PageController _controller;
+  Timer? _timer;
   int _page = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    final startPage = _initialPageOffset * (widget.slides.isEmpty ? 1 : widget.slides.length);
+    _controller = PageController(viewportFraction: 0.92, initialPage: startPage);
+    _page = startPage;
+    _scheduleAutoScroll();
+  }
+
+  @override
+  void didUpdateWidget(covariant CarouselSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.slides.length != widget.slides.length) _scheduleAutoScroll();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _scheduleAutoScroll();
+    } else {
+      _timer?.cancel();
+    }
+  }
+
+  void _scheduleAutoScroll() {
+    _timer?.cancel();
+    if (widget.slides.length < 2) return;
+    _timer = Timer.periodic(_autoScrollInterval, (_) {
+      if (!_controller.hasClients) return;
+      _controller.nextPage(duration: _autoScrollAnimation, curve: Curves.easeInOutCubic);
+    });
+  }
+
+  @override
   void dispose() {
+    _timer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }
@@ -47,15 +98,27 @@ class _CarouselSectionState extends State<CarouselSection> {
       children: [
         SizedBox(
           height: 160,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: widget.slides.length,
-            onPageChanged: (i) => setState(() => _page = i),
-            itemBuilder: (context, index) {
-              final slide = widget.slides[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                child: GestureDetector(
+          child: NotificationListener<ScrollNotification>(
+            // A real user drag carries dragDetails; our own nextPage()
+            // animation doesn't — so this pauses only for manual swipes
+            // and resumes once the user lets go, without fighting the
+            // auto-scroll's own programmatic page changes.
+            onNotification: (notification) {
+              if (notification is ScrollStartNotification && notification.dragDetails != null) {
+                _timer?.cancel();
+              } else if (notification is ScrollEndNotification) {
+                _scheduleAutoScroll();
+              }
+              return false;
+            },
+            child: PageView.builder(
+              controller: _controller,
+              onPageChanged: (i) => setState(() => _page = i),
+              itemBuilder: (context, index) {
+                final slide = widget.slides[index % widget.slides.length];
+                return Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.sm),
+                  child: GestureDetector(
                   onTap: () => _onTap(slide),
                   child: ClipRRect(
                     borderRadius: AppRadius.lgRadius,
@@ -108,14 +171,15 @@ class _CarouselSectionState extends State<CarouselSection> {
                   ),
                 ),
               );
-            },
+              },
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(widget.slides.length, (index) {
-            final isActive = index == _page;
+            final isActive = index == _page % widget.slides.length;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               margin: const EdgeInsets.symmetric(horizontal: 3),

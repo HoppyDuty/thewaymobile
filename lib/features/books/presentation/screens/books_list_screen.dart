@@ -237,7 +237,7 @@ class _BookCard extends StatelessWidget {
                   Text(
                     book.isFree ? 'Free' : '₦${book.price.toStringAsFixed(0)}',
                     style: theme.textTheme.titleSmall?.copyWith(
-                      color: book.isFree ? context.appColors.success : theme.colorScheme.primary,
+                      color: book.isFree ? context.appColors.success : theme.colorScheme.secondary,
                     ),
                   ),
                 ],

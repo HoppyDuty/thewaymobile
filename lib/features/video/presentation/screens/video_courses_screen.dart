@@ -218,7 +218,7 @@ class _VideoCourseCard extends StatelessWidget {
                       Text(
                         course.isFree ? 'Free' : '₦${course.price.toStringAsFixed(0)}',
                         style: theme.textTheme.titleSmall?.copyWith(
-                          color: course.isFree ? context.appColors.success : theme.colorScheme.primary,
+                          color: course.isFree ? context.appColors.success : theme.colorScheme.secondary,
                         ),
                       ),
                     ],
