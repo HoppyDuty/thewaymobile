@@ -275,6 +275,16 @@ class ExamSessionController extends _$ExamSessionController {
         if (questionsBox.get(id) case final q?) q,
     ];
 
+    // A session with no resolvable questions (empty questionIds, or every
+    // question has since been evicted from Hive) can't be resumed —
+    // ExamSessionState.currentQuestion indexes into this list. The entry
+    // point (ExamTypesScreen._findResumableSession) already filters these
+    // out, but guard here too since nothing stops a stale route/deep-link
+    // from hitting this provider directly with an old session key.
+    if (orderedQuestions.isEmpty) {
+      throw StateError('This saved exam session has no questions left to resume.');
+    }
+
     final questionsBySubject = <int, List<QuestionModel>>{};
     for (final q in orderedQuestions) {
       (questionsBySubject[q.subjectId] ??= []).add(q);

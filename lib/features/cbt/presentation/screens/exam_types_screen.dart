@@ -96,6 +96,12 @@ class ExamTypesScreen extends ConsumerWidget {
     OfflineSessionModel? latest;
     for (final session in HiveSetup.offlineSessionsBox.values) {
       if (session.status != SessionStatus.inProgress) continue;
+      // Defensive: a session with zero questions can't actually be resumed
+      // (ExamSessionState.currentQuestion indexes into an empty list) —
+      // found on a real device where a stale/corrupt session from before
+      // this resume feature existed was otherwise offered as "Continue
+      // exam ... 0 of 0 answered" and would have crashed on tap.
+      if (session.questionIds.isEmpty) continue;
       if (latest == null || session.startedAt > latest.startedAt) latest = session;
     }
     return latest;
