@@ -72,6 +72,51 @@ floating-nav-bar-era polish or the `AppIcons` mapping.
 
 ---
 
+## Milestone 2 — Auth screens (Login, Register, OTP verify, Forgot/Reset Password)
+
+### What changed
+- New shared `lib/core/widgets/app_inline_error.dart` (`AppInlineError`) — extracted from a
+  private `_InlineError` class that existed only in `register_screen.dart` and wasn't reused.
+  Now used consistently across all 4 forms (Login, Register, Forgot Password, Reset Password)
+  and OTP Verify, replacing plain red `Text(_errorText!, ...)` calls that relied on color alone
+  (`UI_UX_RULES.md` §14 accessibility rule).
+- New `lib/core/widgets/google_logo_mark.dart` (`GoogleLogoMark`) — replaces
+  `Icons.g_mobiledata_rounded` on the "Continue with Google" button. That icon is Material's
+  mobile-network-signal glyph, not a Google mark at all — a real, pre-existing bug, not a
+  stylistic nitpick. Replaced with a minimal "G" monogram in Google's brand blue rather than a
+  hand-drawn multi-color logomark that can't be visually verified without a device.
+- `AppButton`'s loading state now uses `CupertinoActivityIndicator` instead of a Material
+  `CircularProgressIndicator` (`UI_UX_RULES.md` §6 Level 2) — since `AppButton` is the one
+  button component used app-wide, this one change makes every primary-action loading state in
+  the app consistent, not just auth.
+- `OtpVerifyScreen`'s separate full-size `CircularProgressIndicator()` shown below the OTP
+  boxes while verifying is now a `CupertinoActivityIndicator`, matching the same rule.
+- **Duplicate-submission guards added** (explicitly required by the driving spec's auth
+  section): `_submit()`/`_verify()`/`_resend()`/`_signInWithGoogle()` across all 5 auth
+  screens now early-return if already in flight, instead of relying solely on the button's own
+  disabled-while-loading state (which doesn't protect against other trigger paths, e.g. the
+  OTP input's `onCompleted` firing again).
+
+### Verification performed
+- `flutter analyze` — **VERIFIED**, 0 new issues, whole-project run.
+- `flutter build apk --debug` — still blocked by the `rive_native` issue (see below); not
+  re-attempted for this milestone since the blocker is unrelated to auth and unchanged.
+- **NOT VERIFIED**: visual appearance / actual OTP-entry and Google sign-in flow against a real
+  backend on a device (none available in this environment).
+
+### rive_native blocker — follow-up attempted, not resolved
+Per your direction, bumped `rive: ^0.14.9 → ^0.14.11` and (transitively) `rive_native: 0.1.9 →
+0.1.11` (the latest available per `flutter pub outdated`). **This did not fix the build
+blocker** — confirmed by reading `rive_native-0.1.11/bin/setup.dart:569-576` directly: the
+exact same unquoted `Process.run('powershell', ['Expand-Archive', '-Path', zipFilePath, ...])`
+call is still there, byte-for-byte identical to 0.1.9. The bug is unfixed upstream as of the
+latest release. Since the version bump was the option you chose and it didn't pan out, this
+needs a decision on one of the other paths (drop the dependency until onboarding has real
+`.riv` content — `assets/rive/` is still empty aside from `.gitkeep` — or build from a path
+without a space in it) rather than me picking one unilaterally.
+
+---
+
 ## Architecture inventory (confirmed by direct code audit, not assumed)
 
 **Screens:** 48 distinct screens/dialogs/sheets across 13 features (auth, home, CBT, video,
@@ -129,15 +174,14 @@ Each of these is its own milestone per the driving spec's own instruction ("impl
     pre-auth/gate routes are named `AppRoute` constants today.
 11. **Backend yt-dlp / video-processing pipeline audit** — out of mobile's direct scope; see
     `thewaybackend/PRODUCTION_READINESS.md` for the backend-side follow-up needed.
-12. **CRITICAL: fix the `rive_native` Android build blocker** (see Verification above) — it
-    will break the build on any machine/CI runner whose path contains a space. Options, in
-    order of preference: (a) check for a newer `rive_native`/`rive` release that fixes the
-    `Expand-Archive` invocation upstream and bump the dependency; (b) if `assets/rive/`
-    genuinely has no `.riv` files in use yet (confirmed empty except `.gitkeep`), consider
-    whether `rive`/`rive_native` is even needed right now and temporarily removing it until
-    onboarding actually ships Rive content, re-adding it when there's real content to justify
-    the risk; (c) as a last resort, a CI/build machine whose path has no space in it. Do not
-    hand-patch the vendored `pub-cache` copy — `flutter pub get` overwrites it.
+12. **CRITICAL: fix the `rive_native` Android build blocker** — still open. ~~(a) bump to a
+    newer `rive_native`/`rive` release~~ — **tried, did not work**: 0.1.11 (latest available)
+    has the identical unfixed `Expand-Archive` call. Remaining options: (b) if `assets/rive/`
+    genuinely has no `.riv` files in use yet (confirmed empty except `.gitkeep`), remove
+    `rive`/`rive_native` until onboarding actually ships real Rive content, re-adding it then;
+    (c) build from a machine/CI path with no space in it; (d) fork/patch `rive_native` (its
+    setup script is open source) and point at the fork via a `dependency_override` — more
+    durable than hand-patching `pub-cache` but real maintenance overhead. Needs a decision.
 
 ## Known limitations of this audit pass
 

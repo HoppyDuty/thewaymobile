@@ -6,6 +6,7 @@ import '../../../../core/error/error_mapper.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_inline_error.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../data/auth_repository.dart';
 import '../providers/otp_purpose.dart';
@@ -50,6 +51,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Future<void> _submit() async {
+    if (_isSubmitting) return;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -102,7 +104,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
               if (_errorText != null) ...[
-                _InlineError(message: _errorText!),
+                AppInlineError(message: _errorText!),
                 const SizedBox(height: AppSpacing.md),
               ],
               Row(
@@ -188,30 +190,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _InlineError extends StatelessWidget {
-  const _InlineError({required this.message});
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.error_outline, color: colorScheme.onErrorContainer, size: 20),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text(message, style: TextStyle(color: colorScheme.onErrorContainer))),
-        ],
       ),
     );
   }

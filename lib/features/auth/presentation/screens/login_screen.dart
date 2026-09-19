@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,8 +6,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/error/error_mapper.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_inline_error.dart';
 import '../../../../core/widgets/app_logo.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/google_logo_mark.dart';
 import '../../data/auth_repository.dart';
 import '../../data/google_auth_service.dart';
 import '../providers/auth_session_controller.dart';
@@ -37,6 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
+    if (_isSubmitting || _isGoogleSubmitting) return;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -67,6 +71,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _signInWithGoogle() async {
+    if (_isSubmitting || _isGoogleSubmitting) return;
+
     setState(() {
       _isGoogleSubmitting = true;
       _errorText = null;
@@ -107,7 +113,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: AppSpacing.xl),
               if (_errorText != null) ...[
-                Text(_errorText!, style: TextStyle(color: theme.colorScheme.error)),
+                AppInlineError(message: _errorText!),
                 const SizedBox(height: AppSpacing.md),
               ],
               AppTextField(
@@ -148,10 +154,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
               OutlinedButton.icon(
-                onPressed: _isGoogleSubmitting ? null : _signInWithGoogle,
+                onPressed: (_isGoogleSubmitting || _isSubmitting) ? null : _signInWithGoogle,
                 icon: _isGoogleSubmitting
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Icon(Icons.g_mobiledata_rounded, size: 28),
+                    ? const SizedBox(width: 18, height: 18, child: CupertinoActivityIndicator())
+                    : const GoogleLogoMark(),
                 label: const Text('Continue with Google'),
               ),
               const SizedBox(height: AppSpacing.lg),

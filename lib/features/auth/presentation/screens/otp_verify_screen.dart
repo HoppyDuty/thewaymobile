@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import '../../../../core/error/error_mapper.dart';
 import '../../../../core/notifications/snackbar_service.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_inline_error.dart';
 import '../../data/auth_repository.dart';
 import '../providers/auth_session_controller.dart';
 import '../providers/otp_purpose.dart';
@@ -60,6 +62,8 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   }
 
   Future<void> _verify(String code) async {
+    if (_isVerifying) return;
+
     setState(() {
       _isVerifying = true;
       _errorText = null;
@@ -89,6 +93,7 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
   }
 
   Future<void> _resend() async {
+    if (_isResending) return;
     setState(() => _isResending = true);
     try {
       final challenge = await ref.read(authRepositoryProvider).resendOtp(
@@ -125,11 +130,10 @@ class _OtpVerifyScreenState extends ConsumerState<OtpVerifyScreen> {
               const SizedBox(height: AppSpacing.lg),
               OtpInput(onCompleted: _verify),
               const SizedBox(height: AppSpacing.md),
-              if (_errorText != null)
-                Text(_errorText!, style: TextStyle(color: theme.colorScheme.error)),
+              if (_errorText != null) AppInlineError(message: _errorText!),
               if (_isVerifying) ...[
                 const SizedBox(height: AppSpacing.md),
-                const Center(child: CircularProgressIndicator()),
+                const Center(child: CupertinoActivityIndicator(radius: 12)),
               ],
               const SizedBox(height: AppSpacing.lg),
               Center(

@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// The one button every primary CTA in the app should use, so loading
 /// state, disabled state, and styling stay consistent everywhere
-/// (`uiuxrules.md` §31 component architecture).
+/// (`UI_UX_RULES.md` §6/§15 — short actions get an iOS-style indicator,
+/// not a Material spinner, and every screen shares one button component).
 class AppButton extends StatelessWidget {
   const AppButton({
     super.key,
@@ -22,14 +24,7 @@ class AppButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       child: isLoading
-          ? SizedBox(
-              height: 22,
-              width: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            )
+          ? CupertinoActivityIndicator(color: Theme.of(context).colorScheme.onPrimary)
           : Row(
               mainAxisSize: MainAxisSize.min,
               children: [

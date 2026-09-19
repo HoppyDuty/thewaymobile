@@ -6,6 +6,7 @@ import '../../../../core/error/error_mapper.dart';
 import '../../../../core/notifications/snackbar_service.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
+import '../../../../core/widgets/app_inline_error.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../data/auth_repository.dart';
 import '../providers/otp_purpose.dart';
@@ -37,6 +38,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _submit() async {
+    if (_isSubmitting) return;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -88,7 +90,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
               if (_errorText != null) ...[
-                Text(_errorText!, style: TextStyle(color: theme.colorScheme.error)),
+                AppInlineError(message: _errorText!),
                 const SizedBox(height: AppSpacing.md),
               ],
               AppTextField(
