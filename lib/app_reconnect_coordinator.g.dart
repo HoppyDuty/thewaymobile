@@ -7,7 +7,7 @@ part of 'app_reconnect_coordinator.dart';
 // **************************************************************************
 
 String _$appReconnectCoordinatorHash() =>
-    r'983d18f12473cc68ec90737cda1c6f4d0fb537b6';
+    r'969bbb9a58e83cd2497e24b44a3d610fa233e2b0';
 
 /// App-wide offline→online reconnect trigger (`UI_UX_RULES.md` §11).
 ///

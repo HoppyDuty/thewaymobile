@@ -269,6 +269,47 @@ decoration for its own sake. It's now the second deliberate gold application in 
 
 ---
 
+## Milestone 7 — Profile icon migration; gold streak accent
+
+Profile's remaining screens (delete_account, edit_profile, payment_history, purchases, stats)
+migrated onto `AppIcons`, completing icon-migration coverage across the entire app. On
+`profile_screen.dart`, replaced the inline "🔥" emoji on the streak stat with `AppIcons.practice`
+(a flame glyph) in the brand gold accent — a live streak is exactly the achievement moment
+`UI_UX_RULES.md` §2 names as an example gold use case, and an icon renders consistently instead
+of depending on the platform's emoji font. Also added spacing between the three stat cards,
+which previously sat edge-to-edge with no gap. Verified: `flutter analyze` clean.
+
+Also removed two confirmed-dead files in this pass: `LoadingIndicator` (the last remaining bare
+Material `CircularProgressIndicator` in the codebase — but since nothing referenced it anywhere,
+deleting it was the correct fix, not migrating it) and `ComingSoonPlaceholder` (a leftover
+stand-in from before all 5 bottom-nav tabs were built out).
+
+---
+
+## Milestone 8 — Stale-while-revalidate caching app-wide; reconnect coordinator
+
+The offline-architecture upgrade flagged as remaining work since Milestone 1 (§11). Full detail
+in the commit message (`633fb6f`) — summary:
+
+- New shared `seedAndRevalidate()` helper (`core/storage/stale_while_revalidate.dart`) replaces
+  the old network-first/cache-on-failure pattern with cache shown **immediately** while a fresh
+  copy loads silently behind it, applied to Home, Leaderboard, Books, Videos, News, Profile, and
+  Notifications.
+- New `AppReconnectCoordinator` (`lib/app_reconnect_coordinator.dart`) fixes the exact gap
+  identified in Milestone 1: CBT's `SyncManager` only ever started listening for reconnects once
+  something had built it (in practice, only after visiting the CBT tab). The coordinator existed
+  but wasn't watched anywhere — **the fix was wiring `ref.watch(appReconnectCoordinatorProvider)`
+  into `TheWayApp`'s root** (`app.dart`), which is the one line that actually activates it. On
+  every offline→online transition it now triggers CBT's sync and invalidates Home/Leaderboard/
+  Video/Books/News/Profile.
+
+Verified: `dart run build_runner build` (clean regeneration of all `.g.dart` files) + `flutter
+analyze` clean across the whole project. **Not verified**: actual reconnect behavior on a device
+— no emulator available in this environment; the connectivity-toggle flow in particular should
+be exercised on a real device before considering this fully signed off.
+
+---
+
 ## Architecture inventory (confirmed by direct code audit, not assumed)
 
 **Screens:** 48 distinct screens/dialogs/sheets across 13 features (auth, home, CBT, video,
