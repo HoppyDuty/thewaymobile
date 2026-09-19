@@ -153,6 +153,16 @@ class _PlayerBodyState extends ConsumerState<_PlayerBody> {
               // broken app screen rather than a handled state (UI_UX_RULES.md
               // §7 — errors should be mapped centrally, not left raw).
               if (value.hasError) {
+                // The user-facing message is deliberately generic (never a
+                // raw error code), but the actual code was previously
+                // discarded entirely — there was no way to tell "video
+                // removed" apart from "codec/webview issue" apart from
+                // "transient network blip" from the logs alone, all three of
+                // which collapse into the same _messageFor() bucket.
+                debugPrint(
+                  '[VideoPlayer] playback error for lesson ${widget.lesson.id} '
+                  '(youtube_video_id=${widget.lesson.youtubeVideoId}): ${value.error}',
+                );
                 return AspectRatio(
                   aspectRatio: 16 / 9,
                   child: ColoredBox(
