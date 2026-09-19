@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../auth/presentation/providers/auth_session_controller.dart';
@@ -51,7 +53,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error, size: 48),
+            Icon(AppIcons.warning, color: theme.colorScheme.error, size: 48),
             const SizedBox(height: AppSpacing.md),
             Text(
               'This will deactivate your account. Your exam results and purchase records are kept for legal/audit '
@@ -75,11 +77,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
               style: FilledButton.styleFrom(backgroundColor: theme.colorScheme.error),
               onPressed: _isDeleting ? null : () => _confirmAndDelete(context),
               child: _isDeleting
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.onError),
-                    )
+                  ? CupertinoActivityIndicator(color: theme.colorScheme.onError)
                   : const Text('Delete My Account'),
             ),
           ],

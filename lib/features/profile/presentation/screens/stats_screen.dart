@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_error_state.dart';
@@ -39,18 +40,18 @@ class StatsScreen extends ConsumerWidget {
         data: (profile) {
           final stats = profile.stats;
           final tiles = [
-            (icon: Icons.quiz_outlined, label: 'Exams Taken', value: '${stats.totalExamsTaken}'),
-            (icon: Icons.check_circle_outline, label: 'Questions Answered', value: '${stats.totalQuestionsAnswered}'),
-            (icon: Icons.trending_up, label: 'Average Score', value: '${stats.averageScorePercent.toStringAsFixed(1)}%'),
-            (icon: Icons.star_outline, label: 'Best Score', value: '${stats.bestScorePercent.toStringAsFixed(1)}%'),
-            (icon: Icons.schedule_outlined, label: 'Study Time', value: stats.totalStudyTimeLabel),
-            (icon: Icons.local_fire_department_outlined, label: 'Current Streak', value: '${stats.currentStreakDays}d'),
-            (icon: Icons.emoji_events_outlined, label: 'Longest Streak', value: '${stats.longestStreakDays}d'),
-            (icon: Icons.play_circle_outline, label: 'Videos Watched', value: '${stats.videosWatched}'),
-            (icon: Icons.video_library_outlined, label: 'Courses Enrolled', value: '${stats.coursesEnrolled}'),
-            (icon: Icons.menu_book_outlined, label: 'Books Read', value: '${stats.booksRead}'),
-            (icon: Icons.library_books_outlined, label: 'Books Completed', value: '${stats.booksCompleted}'),
-            (icon: Icons.download_outlined, label: 'Books Saved Offline', value: '${stats.booksSavedOffline}'),
+            (icon: AppIcons.quiz, label: 'Exams Taken', value: '${stats.totalExamsTaken}'),
+            (icon: AppIcons.success, label: 'Questions Answered', value: '${stats.totalQuestionsAnswered}'),
+            (icon: AppIcons.trending, label: 'Average Score', value: '${stats.averageScorePercent.toStringAsFixed(1)}%'),
+            (icon: AppIcons.star, label: 'Best Score', value: '${stats.bestScorePercent.toStringAsFixed(1)}%'),
+            (icon: AppIcons.clock, label: 'Study Time', value: stats.totalStudyTimeLabel),
+            (icon: AppIcons.practice, label: 'Current Streak', value: '${stats.currentStreakDays}d'),
+            (icon: AppIcons.trophy, label: 'Longest Streak', value: '${stats.longestStreakDays}d'),
+            (icon: AppIcons.playOutline, label: 'Videos Watched', value: '${stats.videosWatched}'),
+            (icon: AppIcons.video, label: 'Courses Enrolled', value: '${stats.coursesEnrolled}'),
+            (icon: AppIcons.book, label: 'Books Read', value: '${stats.booksRead}'),
+            (icon: AppIcons.library, label: 'Books Completed', value: '${stats.booksCompleted}'),
+            (icon: AppIcons.download, label: 'Books Saved Offline', value: '${stats.booksSavedOffline}'),
           ];
 
           return GridView.builder(

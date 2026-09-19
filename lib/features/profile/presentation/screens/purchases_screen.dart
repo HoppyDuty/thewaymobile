@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_empty_state.dart';
@@ -40,7 +41,7 @@ class PurchasesScreen extends ConsumerWidget {
             return const AppEmptyState(
               title: 'No purchases yet',
               message: 'Exam access, video courses, and books you buy will appear here.',
-              icon: Icons.shopping_bag_outlined,
+              icon: AppIcons.bag,
             );
           }
 
@@ -89,7 +90,7 @@ class _Section extends StatelessWidget {
                 item.daysLeft > 0 ? '${item.daysLeft} day(s) left' : 'Expired',
                 style: theme.textTheme.bodySmall,
               ),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(AppIcons.chevronRight),
               onTap: () => context.push(PurchasesScreen._typeRoutes[item.type] ?? '/home'),
             ),
           ),

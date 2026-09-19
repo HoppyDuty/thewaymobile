@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -127,21 +128,37 @@ class _StatsSummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasStreak = stats.currentStreakDays > 0;
     return Row(
       children: [
         Expanded(child: _StatTile(label: 'Exams', value: '${stats.totalExamsTaken}')),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(child: _StatTile(label: 'Avg Score', value: '${stats.averageScorePercent.toStringAsFixed(0)}%')),
-        Expanded(child: _StatTile(label: 'Streak', value: '${stats.currentStreakDays}🔥')),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: _StatTile(
+            label: 'Streak',
+            value: '${stats.currentStreakDays}d',
+            // A live streak is an achievement moment (UI_UX_RULES.md §2's
+            // own named example for gold) — an icon, not an emoji, so it
+            // renders consistently instead of depending on the platform's
+            // emoji font.
+            icon: hasStreak ? AppIcons.practice : null,
+            iconColor: hasStreak ? AppColors.gold600 : null,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _StatTile extends StatelessWidget {
-  const _StatTile({required this.label, required this.value});
+  const _StatTile({required this.label, required this.value, this.icon, this.iconColor});
 
   final String label;
   final String value;
+  final IconData? icon;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +169,11 @@ class _StatTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         child: Column(
           children: [
-            Text(value, style: theme.textTheme.titleLarge),
+            if (icon != null) ...[
+              Icon(icon, size: 18, color: iconColor),
+              const SizedBox(height: 2),
+            ],
+            Text(value, style: theme.textTheme.titleLarge?.copyWith(color: iconColor)),
             Text(label, style: theme.textTheme.bodySmall),
           ],
         ),

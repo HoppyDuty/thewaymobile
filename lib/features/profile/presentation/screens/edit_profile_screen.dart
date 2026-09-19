@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_network_image.dart';
@@ -102,13 +104,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       child: CircleAvatar(
                         radius: 18,
                         child: _isUploadingAvatar
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
+                            ? const CupertinoActivityIndicator(radius: 8)
                             : IconButton(
-                                icon: const Icon(Icons.camera_alt_outlined, size: 18),
+                                icon: const Icon(AppIcons.camera, size: 18),
                                 tooltip: 'Change photo',
                                 onPressed: _pickAvatar,
                               ),

@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/error/error_mapper.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme_extension.dart';
@@ -64,7 +66,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
             return const AppEmptyState(
               title: 'No payments yet',
               message: 'Your transaction history will appear here.',
-              icon: Icons.receipt_long_outlined,
+              icon: AppIcons.receipt,
             );
           }
 
@@ -78,7 +80,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                 if (index >= data.items.length) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: CupertinoActivityIndicator()),
                   );
                 }
                 return _PaymentTile(payment: data.items[index]);
@@ -122,7 +124,7 @@ class _PaymentTile extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: AppRadius.mdRadius),
         leading: CircleAvatar(
           backgroundColor: color.withValues(alpha: 0.15),
-          child: Icon(Icons.receipt_outlined, color: color),
+          child: Icon(AppIcons.receipt, color: color),
         ),
         title: Text(payment.contentTitle, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(
