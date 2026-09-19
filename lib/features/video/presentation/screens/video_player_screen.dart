@@ -13,6 +13,24 @@ import '../../data/models/video_lesson.dart';
 import '../../data/video_api.dart';
 import '../providers/video_course_detail_controller.dart';
 
+/// Maps the iframe API's error codes (developers.google.com/youtube/iframe_api_reference#Events)
+/// to user-facing text — never expose "errorCode 101" or similar (UI_UX_RULES.md §7).
+String _messageFor(YoutubeError error) {
+  switch (error) {
+    case YoutubeError.videoNotFound:
+    case YoutubeError.cannotFindVideo:
+      return 'This video is no longer available.';
+    case YoutubeError.notEmbeddable:
+    case YoutubeError.sameAsNotEmbeddable:
+      return "This video can't be played here.";
+    case YoutubeError.invalidParam:
+    case YoutubeError.html5Error:
+    case YoutubeError.unknown:
+    case YoutubeError.none:
+      return "We couldn't play this video. Please try again.";
+  }
+}
+
 class VideoPlayerScreen extends ConsumerWidget {
   const VideoPlayerScreen({super.key, required this.slug, required this.lessonId});
 
@@ -123,15 +141,27 @@ class _PlayerBodyState extends ConsumerState<_PlayerBody> {
       controller: _controller,
       child: Column(
         children: [
-          YoutubePlayer(controller: _controller, aspectRatio: 16 / 9),
           YoutubeValueBuilder(
             controller: _controller,
-            buildWhen: (oldValue, newValue) => oldValue.playerState != newValue.playerState,
+            buildWhen: (oldValue, newValue) =>
+                oldValue.playerState != newValue.playerState || oldValue.error != newValue.error,
             builder: (context, value) {
               if (value.playerState == PlayerState.ended) {
                 WidgetsBinding.instance.addPostFrameCallback((_) => _onCompleted());
               }
-              return const SizedBox.shrink();
+              // The iframe embeds YouTube's own error UI, which reads as a
+              // broken app screen rather than a handled state (UI_UX_RULES.md
+              // §7 — errors should be mapped centrally, not left raw).
+              if (value.hasError) {
+                return AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: ColoredBox(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    child: AppErrorState(message: _messageFor(value.error), icon: AppIcons.warning),
+                  ),
+                );
+              }
+              return YoutubePlayer(controller: _controller, aspectRatio: 16 / 9);
             },
           ),
           Expanded(

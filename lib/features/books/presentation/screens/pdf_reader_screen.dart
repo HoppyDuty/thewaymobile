@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/storage/hive_setup.dart';
+import '../../../../core/widgets/app_error_state.dart';
 import '../../data/book_api.dart';
 
 /// Passed via go_router's `extra` when opening the reader — there's no
@@ -36,6 +38,8 @@ class PdfReaderScreen extends ConsumerStatefulWidget {
 class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
   int _totalPages = 0;
   int _lastSavedPage = 0;
+  bool _isRendering = true;
+  bool _failed = false;
 
   String get _source {
     final saved = HiveSetup.savedBooksBox.get(widget.args.bookId);
@@ -68,17 +72,36 @@ class _PdfReaderScreenState extends ConsumerState<PdfReaderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.args.title)),
-      body: PDFView(
-        filePath: _source,
-        defaultPage: (widget.args.initialPage - 1).clamp(0, 1 << 20),
-        swipeHorizontal: false,
-        autoSpacing: true,
-        pageSnap: true,
-        onPageChanged: _onPageChanged,
-        onError: (error) => ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Could not load PDF: $error'))),
-      ),
+      // Never a blank screen while a large PDF renders (UI_UX_RULES.md §5)
+      // and never a raw technical exception surfaced to the user (§7) —
+      // previously this showed 'Could not load PDF: $error' verbatim.
+      body: _failed
+          ? AppErrorState(
+              message: "We couldn't open this book. Please try again.",
+              onRetry: () => setState(() {
+                _failed = false;
+                _isRendering = true;
+              }),
+            )
+          : Stack(
+              children: [
+                PDFView(
+                  filePath: _source,
+                  defaultPage: (widget.args.initialPage - 1).clamp(0, 1 << 20),
+                  swipeHorizontal: false,
+                  autoSpacing: true,
+                  pageSnap: true,
+                  onRender: (_) {
+                    if (mounted) setState(() => _isRendering = false);
+                  },
+                  onPageChanged: _onPageChanged,
+                  onError: (error) {
+                    if (mounted) setState(() => _failed = true);
+                  },
+                ),
+                if (_isRendering) const Center(child: CupertinoActivityIndicator(radius: 14)),
+              ],
+            ),
     );
   }
 }
